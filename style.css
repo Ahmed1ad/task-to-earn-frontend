@@ -105,81 +105,77 @@ button:hover {
   }
 }
 
-
 /* ===== Header ===== */
-.header {
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   background: #ffffff;
-  padding: 15px 20px;
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.06);
 }
 
-.site-name {
+.logo {
+  font-size: 22px;
+  font-weight: bold;
   color: #22c55e;
-  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.points-box {
+  background: #ecfdf5;
+  color: #16a34a;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
 }
 
 .logout-btn {
   background: #ef4444;
   color: #fff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 7px 14px;
+  border-radius: 20px;
   cursor: pointer;
 }
 
 /* ===== Layout ===== */
-.container {
+.app-container {
   max-width: 1200px;
   margin: auto;
-  padding: 20px;
+  padding: 25px 20px;
 }
 
-/* ===== Top Cards ===== */
-.top-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
+/* ===== Welcome ===== */
+.welcome-box {
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  color: #fff;
+  padding: 25px;
+  border-radius: 18px;
   margin-bottom: 30px;
 }
 
-.card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+.welcome-box h2 {
+  margin: 0 0 8px;
 }
 
-.welcome-card h3 {
-  margin-top: 0;
-  color: #111;
+.welcome-box p {
+  margin: 0;
+  opacity: 0.95;
 }
 
-.welcome-card p {
-  color: #555;
-  margin-bottom: 0;
-}
-
-.balance-card {
-  text-align: center;
-}
-
-.balance-card h4 {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.balance {
-  font-size: 28px;
-  font-weight: bold;
-  color: #22c55e;
-}
-
-/* ===== Tasks Section ===== */
+/* ===== Tasks ===== */
 .tasks-section {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .section-title {
@@ -188,18 +184,60 @@ button:hover {
 
 .tasks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
 }
 
+/* ===== Task Card ===== */
 .task-card {
   background: #ffffff;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  border-radius: 18px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.task-card.placeholder {
-  text-align: center;
-  color: #777;
+.task-card h4 {
+  margin: 0;
+}
+
+.task-card p {
+  color: #555;
+  font-size: 14px;
+}
+
+.task-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #444;
+}
+
+/* ===== Buttons ===== */
+.primary-btn {
+  margin-top: auto;
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.primary-btn:hover {
+  background: #16a34a;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .welcome-box {
+    padding: 20px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
 }

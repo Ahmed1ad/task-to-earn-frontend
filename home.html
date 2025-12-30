@@ -2,73 +2,60 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>TaskToEarn | الرئيسية</title>
+  <title>TaskToEarn</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- ===== Header ===== -->
-<header class="app-header">
-  <div class="header-left">
-    <span class="logo">TaskToEarn</span>
-  </div>
+<!-- ========== HEADER ========== -->
+<header class="header">
+  <div class="logo">TaskToEarn</div>
 
   <div class="header-right">
-    <div class="points-box">
-      💰 <span id="points">0</span> نقطة
+    <div class="points">
+      💰 <span id="points">0</span>
     </div>
-    <button class="logout-btn" onclick="logout()">خروج</button>
+    <button class="menu-btn">☰</button>
   </div>
 </header>
 
-<!-- ===== Main ===== -->
-<main class="app-container">
+<!-- ========== MAIN ========== -->
+<main class="container">
 
   <!-- Welcome -->
-  <section class="welcome-box">
-    <h2>👋 مرحبًا بك</h2>
+  <section class="welcome">
+    <h1>مرحبًا بك 👋</h1>
     <p>نفّذ المهام البسيطة واربح نقاط قابلة للسحب</p>
   </section>
 
   <!-- Tasks -->
-  <section class="tasks-section">
-    <h3 class="section-title">المهام المتاحة</h3>
+  <section class="tasks">
+    <h2>المهام المتاحة</h2>
 
-    <div class="tasks-grid">
-      <!-- Example Card -->
+    <div class="task-grid">
+
       <div class="task-card">
-        <h4>مشاهدة إعلان</h4>
-        <p>شاهد الإعلان للنهاية واحصل على نقاط</p>
+        <div class="task-icon">📺</div>
 
-        <div class="task-info">
-          <span>⏱️ 5 ثواني</span>
-          <span>🎁 10 نقاط</span>
+        <div class="task-body">
+          <h3>مشاهدة إعلان</h3>
+          <p>شاهد الإعلان للنهاية واحصل على نقاط</p>
+
+          <div class="task-meta">
+            <span>⏱ 5 ثواني</span>
+            <span>🎁 10 نقاط</span>
+          </div>
+
+          <button class="task-btn">ابدأ المهمة</button>
         </div>
-
-        <button class="primary-btn">ابدأ المهمة</button>
       </div>
+
     </div>
   </section>
 
 </main>
-
-<script src="main.js"></script>
-
-<script>
-  const token =
-    localStorage.getItem('token') || sessionStorage.getItem('token');
-
-  if (!token) {
-    window.location.replace('index.html');
-  }
-
-  function logout() {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
-    window.location.replace('index.html');
-  }
-</script>
 
 </body>
 </html>

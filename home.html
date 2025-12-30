@@ -1,35 +1,48 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>TaskToEarn</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-  <!-- ===== Header ===== -->
-  <header class="top-header">
-    <div class="logo">TaskToEarn</div>
-    <div class="user-info">
-      <span id="points">0 نقطة</span>
-      <button id="logoutBtn">خروج</button>
+<!-- ===== Header ===== -->
+<header class="header">
+  <div class="logo">💸 TaskToEarn</div>
+
+  <div class="header-right">
+    <div class="points-box">
+      <span id="points">0</span> نقطة 🪙
     </div>
-  </header>
+    <button id="logoutBtn" class="logout-btn">خروج</button>
+  </div>
+</header>
 
-  <!-- ===== Main Content ===== -->
-  <main class="container">
+<!-- ===== Layout ===== -->
+<div class="layout">
 
-    <!-- Welcome Card -->
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <a class="active">🏠 الرئيسية</a>
+    <a>💰 السحب</a>
+    <a>📜 السجل</a>
+    <a>👤 حسابي</a>
+  </aside>
+
+  <!-- Main -->
+  <main class="content">
+
+    <!-- Welcome -->
     <section class="welcome-card">
       <h2>👋 مرحبًا بك</h2>
-      <p>نفّذ المهام البسيطة واربح نقاط قابلة للسحب</p>
+      <p>نفّذ المهام البسيطة واحصل على نقاط قابلة للسحب</p>
     </section>
 
     <!-- Tasks -->
-    <section>
-      <h3 class="section-title">المهام المتاحة</h3>
+    <section class="tasks-section">
+      <h3>المهام المتاحة</h3>
 
       <div class="tasks-grid">
 
@@ -39,7 +52,7 @@
           <h4>مشاهدة إعلان</h4>
           <p>شاهد الإعلان للنهاية واحصل على نقاط</p>
 
-          <div class="task-meta">
+          <div class="task-info">
             <span>⏱ 5 ثواني</span>
             <span>🎁 10 نقاط</span>
           </div>
@@ -51,15 +64,8 @@
     </section>
 
   </main>
+</div>
 
-  <!-- ===== Bottom Navigation ===== -->
-  <nav class="bottom-nav">
-    <button class="active">🏠 الرئيسية</button>
-    <button>💰 السحب</button>
-    <button>📜 السجل</button>
-    <button>👤 حسابي</button>
-  </nav>
-
-  <script src="main.js"></script>
+<script src="main.js"></script>
 </body>
 </html>

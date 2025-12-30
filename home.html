@@ -8,45 +8,67 @@
 </head>
 <body>
 
-<!-- Header -->
-<header class="header">
-  <h2 class="site-name">TaskToEarn</h2>
-  <button class="logout-btn">تسجيل خروج</button>
+<!-- ===== Header ===== -->
+<header class="app-header">
+  <div class="header-left">
+    <span class="logo">TaskToEarn</span>
+  </div>
+
+  <div class="header-right">
+    <div class="points-box">
+      💰 <span id="points">0</span> نقطة
+    </div>
+    <button class="logout-btn" onclick="logout()">خروج</button>
+  </div>
 </header>
 
-<!-- Main Content -->
-<main class="container">
+<!-- ===== Main ===== -->
+<main class="app-container">
 
-  <!-- Top Cards -->
-  <section class="top-cards">
-
-    <!-- Welcome Card -->
-    <div class="card welcome-card">
-      <h3>👋 أهلًا بك</h3>
-      <p>ابدأ تنفيذ المهام واربح نقاط قابلة للسحب</p>
-    </div>
-
-    <!-- Balance Card -->
-    <div class="card balance-card">
-      <h4>💰 رصيدك الحالي</h4>
-      <span class="balance">0 نقطة</span>
-    </div>
-
+  <!-- Welcome -->
+  <section class="welcome-box">
+    <h2>👋 مرحبًا بك</h2>
+    <p>نفّذ المهام البسيطة واربح نقاط قابلة للسحب</p>
   </section>
 
-  <!-- Tasks Section -->
+  <!-- Tasks -->
   <section class="tasks-section">
-    <h3 class="section-title">📌 المهام المتاحة</h3>
+    <h3 class="section-title">المهام المتاحة</h3>
 
-    <!-- Tasks will be injected here later -->
     <div class="tasks-grid">
-      <div class="task-card placeholder">
-        <p>سيتم عرض المهام هنا</p>
+      <!-- Example Card -->
+      <div class="task-card">
+        <h4>مشاهدة إعلان</h4>
+        <p>شاهد الإعلان للنهاية واحصل على نقاط</p>
+
+        <div class="task-info">
+          <span>⏱️ 5 ثواني</span>
+          <span>🎁 10 نقاط</span>
+        </div>
+
+        <button class="primary-btn">ابدأ المهمة</button>
       </div>
     </div>
   </section>
 
 </main>
+
+<script src="main.js"></script>
+
+<script>
+  const token =
+    localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  if (!token) {
+    window.location.replace('index.html');
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+    window.location.replace('index.html');
+  }
+</script>
 
 </body>
 </html>

@@ -1,10 +1,10 @@
 const API = 'https://task-to-earn.onrender.com';
 
-// 🔐 Auto login (Remember Me fix)
 const token =
   localStorage.getItem('token') || sessionStorage.getItem('token');
 
-if (token) {
+// تحويل تلقائي من صفحة اللوجن فقط
+if (token && window.location.pathname.includes('index.html')) {
   window.location.href = 'ads.html';
 }
 

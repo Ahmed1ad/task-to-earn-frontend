@@ -8,23 +8,27 @@ function logout() {
   location.href = "index.html";
 }
 
-// تحميل بيانات المستخدم
-fetch(API + "/me", {
-  headers: { Authorization: "Bearer " + token }
-})
-.then(r => r.json())
-.then(d => {
-  document.getElementById("userPoints").innerText = d.user.points;
-});
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    location.href = "index.html";
+    return;
+  }
 
-function startAd(id) {
-  fetch(API + "/tasks/ads/start/" + id, {
-    method: "POST",
-    headers: { Authorization: "Bearer " + token }
-  }).then(() => {
-    alert("بدأت المهمة – انتظر انتهاء الوقت ⏳");
-  });
-}
+  fetch("https://task-to-earn.onrender.com/me", {
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      const el = document.getElementById("userPoints");
+      if (el) el.innerText = data.user.points;
+    }
+  })
+  .catch(err => console.error(err));
+});
 
   
   

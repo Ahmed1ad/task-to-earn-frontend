@@ -1,46 +1,42 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>TaskToEarn</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<!-- ========== HEADER ========== -->
-<header class="header">
-  <div class="logo">TaskToEarn</div>
-
-  <div class="header-right">
-    <div class="points">
-      💰 <span id="points">0</span>
+  <!-- ===== Header ===== -->
+  <header class="top-header">
+    <div class="logo">TaskToEarn</div>
+    <div class="user-info">
+      <span id="points">0 نقطة</span>
+      <button id="logoutBtn">خروج</button>
     </div>
-    <button class="menu-btn">☰</button>
-  </div>
-</header>
+  </header>
 
-<!-- ========== MAIN ========== -->
-<main class="container">
+  <!-- ===== Main Content ===== -->
+  <main class="container">
 
-  <!-- Welcome -->
-  <section class="welcome">
-    <h1>مرحبًا بك 👋</h1>
-    <p>نفّذ المهام البسيطة واربح نقاط قابلة للسحب</p>
-  </section>
+    <!-- Welcome Card -->
+    <section class="welcome-card">
+      <h2>👋 مرحبًا بك</h2>
+      <p>نفّذ المهام البسيطة واربح نقاط قابلة للسحب</p>
+    </section>
 
-  <!-- Tasks -->
-  <section class="tasks">
-    <h2>المهام المتاحة</h2>
+    <!-- Tasks -->
+    <section>
+      <h3 class="section-title">المهام المتاحة</h3>
 
-    <div class="task-grid">
+      <div class="tasks-grid">
 
-      <div class="task-card">
-        <div class="task-icon">📺</div>
-
-        <div class="task-body">
-          <h3>مشاهدة إعلان</h3>
+        <!-- Task Card -->
+        <div class="task-card">
+          <div class="task-icon">📺</div>
+          <h4>مشاهدة إعلان</h4>
           <p>شاهد الإعلان للنهاية واحصل على نقاط</p>
 
           <div class="task-meta">
@@ -50,12 +46,20 @@
 
           <button class="task-btn">ابدأ المهمة</button>
         </div>
+
       </div>
+    </section>
 
-    </div>
-  </section>
+  </main>
 
-</main>
+  <!-- ===== Bottom Navigation ===== -->
+  <nav class="bottom-nav">
+    <button class="active">🏠 الرئيسية</button>
+    <button>💰 السحب</button>
+    <button>📜 السجل</button>
+    <button>👤 حسابي</button>
+  </nav>
 
+  <script src="main.js"></script>
 </body>
 </html>

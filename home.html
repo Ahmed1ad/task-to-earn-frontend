@@ -8,63 +8,57 @@
 </head>
 <body>
 
-<!-- ===== Header ===== -->
+<!-- Header -->
 <header class="header">
-  <div class="logo">💸 TaskToEarn</div>
-
-  <div class="header-right">
-    <div class="points-box">
-      <span id="points">0</span> نقطة 🪙
-    </div>
-    <button id="logoutBtn" class="logout-btn">خروج</button>
+  <div class="logo">TaskToEarn</div>
+  <div class="user-box">
+    <span id="userPoints">0</span> نقطة
+    <button class="logout" onclick="logout()">خروج</button>
   </div>
 </header>
 
-<!-- ===== Layout ===== -->
-<div class="layout">
+<!-- Main -->
+<main class="container">
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <a class="active">🏠 الرئيسية</a>
-    <a>💰 السحب</a>
-    <a>📜 السجل</a>
-    <a>👤 حسابي</a>
-  </aside>
+  <!-- Welcome Banner -->
+  <section class="welcome">
+    <h2>👋 مرحبًا بك</h2>
+    <p>نفّذ مهام بسيطة واربح نقاط قابلة للسحب</p>
+  </section>
 
-  <!-- Main -->
-  <main class="content">
+  <!-- Tasks -->
+  <section class="tasks">
+    <h3>المهام المتاحة</h3>
 
-    <!-- Welcome -->
-    <section class="welcome-card">
-      <h2>👋 مرحبًا بك</h2>
-      <p>نفّذ المهام البسيطة واحصل على نقاط قابلة للسحب</p>
-    </section>
+    <div class="tasks-grid">
 
-    <!-- Tasks -->
-    <section class="tasks-section">
-      <h3>المهام المتاحة</h3>
+      <div class="task-card">
+        <div class="task-icon">📺</div>
+        <h4>مشاهدة إعلان</h4>
+        <p>شاهد الإعلان للنهاية واحصل على نقاط</p>
 
-      <div class="tasks-grid">
-
-        <!-- Task Card -->
-        <div class="task-card">
-          <div class="task-icon">📺</div>
-          <h4>مشاهدة إعلان</h4>
-          <p>شاهد الإعلان للنهاية واحصل على نقاط</p>
-
-          <div class="task-info">
-            <span>⏱ 5 ثواني</span>
-            <span>🎁 10 نقاط</span>
-          </div>
-
-          <button class="task-btn">ابدأ المهمة</button>
+        <div class="task-meta">
+          <span>⏱ 5 ثواني</span>
+          <span>🎁 10 نقاط</span>
         </div>
 
+        <button class="task-btn" onclick="startAd(1)">
+          ابدأ المهمة
+        </button>
       </div>
-    </section>
 
-  </main>
-</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <button class="active">🏠 الرئيسية</button>
+  <button>💰 السحب</button>
+  <button>📜 السجل</button>
+  <button>👤 حسابي</button>
+</nav>
 
 <script src="main.js"></script>
 </body>

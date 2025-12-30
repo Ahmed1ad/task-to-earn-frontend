@@ -1,23 +1,30 @@
-const API = 'https://task-to-earn.onrender.com';
+const API = "https://task-to-earn.onrender.com";
 
-function getToken() {
-  return localStorage.getItem('token') || sessionStorage.getItem('token');
+const token = localStorage.getItem("token");
+if (!token) location.href = "index.html";
 
-
-// حماية الصفحة
-const token = localStorage.getItem('token');
-if (!token) {
-  window.location.href = 'index.html';
+function logout() {
+  localStorage.removeItem("token");
+  location.href = "index.html";
 }
 
-// خروج
-document.getElementById('logoutBtn').onclick = () => {
-  localStorage.removeItem('token');
-  window.location.href = 'index.html';
-};
+// تحميل بيانات المستخدم
+fetch(API + "/me", {
+  headers: { Authorization: "Bearer " + token }
+})
+.then(r => r.json())
+.then(d => {
+  document.getElementById("userPoints").innerText = d.user.points;
+});
 
-// مثال تحميل النقاط (مؤقت)
-document.getElementById('points').innerText = 0;
+function startAd(id) {
+  fetch(API + "/tasks/ads/start/" + id, {
+    method: "POST",
+    headers: { Authorization: "Bearer " + token }
+  }).then(() => {
+    alert("بدأت المهمة – انتظر انتهاء الوقت ⏳");
+  });
+}
 
   
   

@@ -2,6 +2,25 @@ const API = 'https://task-to-earn.onrender.com';
 
 function getToken() {
   return localStorage.getItem('token') || sessionStorage.getItem('token');
+
+
+// حماية الصفحة
+const token = localStorage.getItem('token');
+if (!token) {
+  window.location.href = 'index.html';
+}
+
+// خروج
+document.getElementById('logoutBtn').onclick = () => {
+  localStorage.removeItem('token');
+  window.location.href = 'index.html';
+};
+
+// مثال تحميل النقاط (مؤقت)
+document.getElementById('points').innerText = 0;
+
+  
+  
 }
 
 let isLogin = true;

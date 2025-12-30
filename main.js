@@ -1,11 +1,7 @@
 const API = 'https://task-to-earn.onrender.com';
 
-const token =
-  localStorage.getItem('token') || sessionStorage.getItem('token');
-
-// تحويل تلقائي من صفحة اللوجن فقط
-if (token && window.location.pathname.includes('index.html')) {
-  window.location.href = 'ads.html';
+function getToken() {
+  return localStorage.getItem('token') || sessionStorage.getItem('token');
 }
 
 let isLogin = true;

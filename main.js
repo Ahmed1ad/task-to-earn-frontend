@@ -30,7 +30,31 @@ document.addEventListener("DOMContentLoaded", () => {
   .catch(err => console.error(err));
 });
 
-  
+
+function startAd(taskId) {
+  const token = localStorage.getItem("token");
+
+  fetch(`https://task-to-earn.onrender.com/tasks/ads/start/${taskId}`, {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      alert("⏳ المهمة بدأت، انتظر انتهاء الوقت");
+    } else {
+      alert(data.message || "خطأ");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("خطأ في الاتصال بالسيرفر");
+  });
+}
+
+
   
 }
 

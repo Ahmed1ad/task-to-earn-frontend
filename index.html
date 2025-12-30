@@ -34,5 +34,16 @@
 </div>
 
 <script src="main.js"></script>
+
+<!-- ✅ Redirect خاص بصفحة اللوجن فقط -->
+<script>
+  const token =
+    localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  if (token && (location.pathname === '/' || location.pathname.endsWith('index.html'))) {
+    window.location.replace('ads.html');
+  }
+</script>
+
 </body>
 </html>

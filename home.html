@@ -2,41 +2,51 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>TaskToEarn | الإعلانات</title>
+  <title>TaskToEarn | الرئيسية</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- Header -->
 <header class="header">
-  <h2>TaskToEarn</h2>
-  <button onclick="logout()">تسجيل خروج</button>
+  <h2 class="site-name">TaskToEarn</h2>
+  <button class="logout-btn">تسجيل خروج</button>
 </header>
 
-<div class="container">
-  <h3 class="page-title">الإعلانات المتاحة</h3>
-  <div id="home"></div>
-</div>
+<!-- Main Content -->
+<main class="container">
 
-<script src="main.js"></script>
+  <!-- Top Cards -->
+  <section class="top-cards">
 
-<!-- ✅ حماية الصفحة + منع refresh loop -->
-<script>
-  const token =
-    localStorage.getItem('token') || sessionStorage.getItem('token');
+    <!-- Welcome Card -->
+    <div class="card welcome-card">
+      <h3>👋 أهلًا بك</h3>
+      <p>ابدأ تنفيذ المهام واربح نقاط قابلة للسحب</p>
+    </div>
 
-  if (!token) {
-    window.location.replace('index.html');
-  } else {
-    loadAds();
-  }
+    <!-- Balance Card -->
+    <div class="card balance-card">
+      <h4>💰 رصيدك الحالي</h4>
+      <span class="balance">0 نقطة</span>
+    </div>
 
-  function logout() {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
-    window.location.replace('index.html');
-  }
-</script>
+  </section>
+
+  <!-- Tasks Section -->
+  <section class="tasks-section">
+    <h3 class="section-title">📌 المهام المتاحة</h3>
+
+    <!-- Tasks will be injected here later -->
+    <div class="tasks-grid">
+      <div class="task-card placeholder">
+        <p>سيتم عرض المهام هنا</p>
+      </div>
+    </div>
+  </section>
+
+</main>
 
 </body>
 </html>

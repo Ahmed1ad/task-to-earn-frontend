@@ -68,7 +68,7 @@ async function submitForm() {
       } else {
         sessionStorage.setItem('token', data.token);
       }
-      window.location.href = 'ads.html';
+      window.location.href = 'home.html';
     } else {
       document.getElementById('msg').innerText =
         data.message || 'فشل تسجيل الدخول';

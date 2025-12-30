@@ -110,127 +110,137 @@ button:hover {
 
 
 
-/* ===== HEADER ===== */
-.header {
-  height: 64px;
+
+/* ===== Header ===== */
+.top-header {
+  position: sticky;
+  top: 0;
   background: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 18px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 15px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  z-index: 10;
 }
 
 .logo {
   font-size: 20px;
   font-weight: bold;
-  color: #22c55e;
+  color: #2ecc71;
 }
 
-.header-right {
+.user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.points {
-  background: #ecfdf5;
-  color: #16a34a;
-  padding: 6px 14px;
-  border-radius: 20px;
+#points {
   font-weight: bold;
+  color: #27ae60;
 }
 
-.menu-btn {
-  background: none;
+#logoutBtn {
+  background: #ff4d4d;
+  color: #fff;
   border: none;
-  font-size: 22px;
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-/* ===== MAIN ===== */
+/* ===== Main ===== */
 .container {
   max-width: 1100px;
   margin: auto;
   padding: 20px;
 }
 
-/* ===== WELCOME ===== */
-.welcome {
-  background: linear-gradient(135deg, #22c55e, #4ade80);
+.welcome-card {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
   color: #fff;
-  padding: 24px;
-  border-radius: 18px;
-  margin-bottom: 30px;
+  padding: 25px;
+  border-radius: 16px;
+  margin-bottom: 25px;
 }
 
-.welcome h1 {
-  margin: 0 0 8px;
+.section-title {
+  margin-bottom: 15px;
 }
 
-/* ===== TASKS ===== */
-.tasks h2 {
-  margin-bottom: 16px;
-}
-
-.task-grid {
+/* ===== Tasks Grid ===== */
+.tasks-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
 }
 
-/* ===== CARD ===== */
 .task-card {
   background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
   display: flex;
-  gap: 16px;
-  padding: 16px;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .task-icon {
-  font-size: 36px;
+  font-size: 40px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-.task-body h3 {
-  margin: 0;
+.task-card h4 {
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-.task-body p {
+.task-card p {
+  text-align: center;
   font-size: 14px;
-  color: #555;
+  color: #666;
 }
 
 .task-meta {
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
+  margin: 15px 0;
   font-size: 14px;
-  margin: 10px 0;
 }
 
 .task-btn {
-  width: 100%;
-  padding: 10px;
-  background: #22c55e;
+  background: #2ecc71;
   color: #fff;
   border: none;
-  border-radius: 12px;
-  font-size: 15px;
+  padding: 10px;
+  border-radius: 10px;
   cursor: pointer;
+  font-size: 16px;
 }
 
-.task-btn:hover {
-  background: #16a34a;
+/* ===== Bottom Nav ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
 }
 
-/* ===== MOBILE ===== */
-@media (max-width: 600px) {
-  .task-card {
-    flex-direction: column;
-    text-align: center;
-  }
+.bottom-nav button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #666;
+}
+
+.bottom-nav .active {
+  color: #2ecc71;
+  font-weight: bold;
 }

@@ -163,3 +163,45 @@ function logout() {
 ========================= */
 window.startTask = startTask;
 window.logout = logout;
+
+
+/* =========================
+   LOGIN
+========================= */
+const loginBtn = document.getElementById("loginBtn");
+
+if (loginBtn) {
+  loginBtn.addEventListener("click", login);
+}
+
+async function login() {
+  const email = document.getElementById("email")?.value;
+  const password = document.getElementById("password")?.value;
+
+  if (!email || !password) {
+    alert("من فضلك أدخل البريد الإلكتروني وكلمة المرور");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://task-to-earn.onrender.com/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (data.status === "success") {
+      localStorage.setItem("token", data.token);
+      location.href = "home.html";
+    } else {
+      alert(data.message || "فشل تسجيل الدخول");
+    }
+
+  } catch (err) {
+    alert("خطأ في الاتصال بالسيرفر");
+  }
+}

@@ -165,9 +165,11 @@ window.startTask = startTask;
 window.logout = logout;
 
 
-/* =========================
-   LOGIN
-========================= */
+
+
+
+
+
 const loginBtn = document.getElementById("loginBtn");
 
 if (loginBtn) {
@@ -175,8 +177,8 @@ if (loginBtn) {
 }
 
 async function login() {
-  const email = document.getElementById("email")?.value;
-  const password = document.getElementById("password")?.value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
     alert("من فضلك أدخل البريد الإلكتروني وكلمة المرور");
@@ -186,9 +188,7 @@ async function login() {
   try {
     const res = await fetch("https://task-to-earn.onrender.com/auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
     });
 
@@ -198,7 +198,7 @@ async function login() {
       localStorage.setItem("token", data.token);
       location.href = "home.html";
     } else {
-      alert(data.message || "فشل تسجيل الدخول");
+      alert(data.message || "بيانات الدخول غير صحيحة");
     }
 
   } catch (err) {

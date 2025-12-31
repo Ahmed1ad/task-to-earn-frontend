@@ -5,110 +5,74 @@
   <title>TaskToEarn | تسجيل الدخول</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Cairo Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: "Cairo", system-ui, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #ecfdf5, #f0fdfa);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #0f172a;
-    }
-
-    .auth-card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 380px;
-      padding: 32px;
-      border-radius: 22px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      animation: fadeUp .6s ease;
-    }
-
-    .auth-card h1 {
-      margin: 0 0 8px;
-      text-align: center;
-      color: #16a34a;
-      font-weight: 800;
-    }
-
-    .auth-card p {
-      text-align: center;
-      color: #64748b;
-      margin-bottom: 28px;
-      font-size: 14px;
-    }
-
-    .auth-card input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 14px;
-      border-radius: 14px;
-      border: 1px solid #e5e7eb;
-      font-size: 15px;
-    }
-
-    .auth-card button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 14px;
-      background: #22c55e;
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .switch {
-      text-align: center;
-      margin-top: 16px;
-      font-size: 14px;
-    }
-
-    .switch span {
-      color: #16a34a;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .msg {
-      text-align: center;
-      margin-top: 14px;
-      font-size: 14px;
-      color: #ef4444;
-      min-height: 18px;
-    }
-
-    @keyframes fadeUp {
-      from {opacity:0;transform:translateY(20px)}
-      to {opacity:1;transform:none}
-    }
+    body { font-family: 'Cairo', sans-serif; }
   </style>
 </head>
 
-<body>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50">
 
-  <div class="auth-card">
-    <h1>TaskToEarn</h1>
-    <p id="title">تسجيل الدخول إلى حسابك</p>
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8">
 
-    <input type="email" id="email" placeholder="البريد الإلكتروني" />
-    <input type="password" id="password" placeholder="كلمة المرور" />
+    <h1 class="text-3xl font-extrabold text-emerald-600 text-center mb-2">
+      TaskToEarn
+    </h1>
 
-    <button id="actionBtn">تسجيل دخول</button>
+    <p id="title" class="text-center text-gray-500 mb-6">
+      تسجيل الدخول إلى حسابك
+    </p>
 
-    <div id="msg" class="msg"></div>
+    <!-- Username (Register only) -->
+    <input
+      id="username"
+      type="text"
+      placeholder="اسم المستخدم"
+      class="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-emerald-500 hidden"
+    />
 
-    <div class="switch">
-      <span id="switchText">ليس لديك حساب؟ إنشاء حساب</span>
+    <!-- Email -->
+    <input
+      id="email"
+      type="email"
+      placeholder="البريد الإلكتروني"
+      class="w-full mb-3 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-emerald-500"
+    />
+
+    <!-- Password -->
+    <input
+      id="password"
+      type="password"
+      placeholder="كلمة المرور"
+      class="w-full mb-4 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-emerald-500"
+    />
+
+    <!-- Action Button -->
+    <button
+      id="actionBtn"
+      class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition"
+    >
+      تسجيل دخول
+    </button>
+
+    <!-- Message -->
+    <div id="msg" class="text-center text-red-500 text-sm mt-4 min-h-[18px]"></div>
+
+    <!-- Switch -->
+    <div class="text-center text-sm mt-6">
+      <span
+        id="switchText"
+        class="text-emerald-600 font-bold cursor-pointer"
+      >
+        ليس لديك حساب؟ إنشاء حساب
+      </span>
     </div>
+
   </div>
 
   <script src="main.js"></script>

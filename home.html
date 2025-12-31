@@ -2,165 +2,220 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>TaskToEarn | الصفحة الرئيسية</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskToEarn | الرئيسية</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#22c55e"
+          }
+        }
+      }
     }
-  </style>
+  </script>
 </head>
 
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen font-sans">
 
-<!-- ================= Navbar ================= -->
-<header class="fixed top-0 right-0 left-0 bg-white shadow z-50">
-  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
-
+<!-- ================= Header ================= -->
+<header class="fixed top-0 w-full bg-white shadow z-50">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    
     <!-- Menu Button -->
     <button id="menuBtn" class="text-2xl">☰</button>
 
     <!-- Points -->
-    <div class="flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
-      <span>💰</span>
-      <span id="userPoints">0</span>
+    <div class="flex items-center gap-2 bg-emerald-100 px-3 py-1 rounded-full">
+      <span>🪙</span>
+      <span id="userPoints" class="font-bold">0</span>
     </div>
 
     <!-- Profile -->
-    <div class="relative">
-      <button id="profileBtn" class="w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center">
-        👤
-      </button>
-
-      <!-- Profile Menu -->
-      <div id="profileMenu" class="hidden absolute left-0 mt-2 w-40 bg-white shadow rounded-lg overflow-hidden">
-        <a href="#" class="block px-4 py-2 hover:bg-gray-100">حسابي</a>
-        <button onclick="logout()" class="w-full text-right px-4 py-2 hover:bg-gray-100 text-red-600">
-          تسجيل خروج
-        </button>
-      </div>
+    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
+      👤
     </div>
-
   </div>
 </header>
 
-<!-- ================= Side Menu ================= -->
-<div id="sideMenu" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
-  <div class="p-4 space-y-4">
-    <h2 class="text-xl font-bold text-emerald-600">TaskToEarn</h2>
+<!-- ================= Sidebar ================= -->
+<aside id="sidebar"
+  class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform z-50">
 
-    <a href="#" class="block bg-emerald-500 text-white rounded-lg px-4 py-2">🏠 الرئيسية</a>
-    <a href="#" class="block hover:bg-gray-100 rounded-lg px-4 py-2">📋 المهام</a>
-    <a href="#" class="block hover:bg-gray-100 rounded-lg px-4 py-2">💸 السحب</a>
-    <a href="#" class="block hover:bg-gray-100 rounded-lg px-4 py-2">📜 السجل</a>
+  <div class="p-4 border-b font-bold text-lg">القائمة</div>
 
-    <button onclick="logout()" class="w-full mt-6 bg-red-500 text-white py-2 rounded-lg">
-      تسجيل خروج
-    </button>
-  </div>
-</div>
+  <nav class="p-4 flex flex-col gap-3">
+    <button class="text-right p-3 rounded-lg bg-emerald-100">🏠 الرئيسية</button>
+    <button class="text-right p-3 rounded-lg hover:bg-gray-100">📋 المهام</button>
+    <button class="text-right p-3 rounded-lg hover:bg-gray-100">💰 السحب</button>
+    <button class="text-right p-3 rounded-lg hover:bg-gray-100">🧾 السجل</button>
+    <button onclick="logout()" class="text-right p-3 rounded-lg bg-red-100 text-red-600">🚪 خروج</button>
+  </nav>
+</aside>
 
-<!-- ================= Overlay ================= -->
-<div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-40"></div>
+<!-- Overlay -->
+<div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
-<!-- ================= Main Content ================= -->
-<main class="pt-24 pb-10 max-w-7xl mx-auto px-4 space-y-8">
+<!-- ================= Main ================= -->
+<main class="pt-24 max-w-6xl mx-auto px-4">
 
-  <!-- Welcome Card -->
-  <div class="bg-gradient-to-r from-emerald-500 to-green-400 text-white rounded-2xl p-6 shadow">
-    <h2 class="text-2xl font-bold mb-1">👋 مرحبًا <span id="username">بك</span></h2>
+  <!-- Welcome -->
+  <div class="bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-2xl p-6 mb-8 shadow">
+    <h2 class="text-2xl font-bold mb-2">👋 مرحبًا <span id="username">...</span></h2>
     <p>نفّذ المهام البسيطة واربح نقاط قابلة للسحب</p>
   </div>
 
-  <!-- Tasks Section -->
+  <!-- Tasks -->
   <section>
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-xl font-bold">📋 المهام المتاحة</h3>
-      <a href="#" class="text-emerald-600 hover:underline">عرض المزيد</a>
-    </div>
+    <h3 class="text-xl font-bold mb-4">📺 المهام المتاحة</h3>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="tasksContainer"
+      class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
 
-      <!-- Task Card -->
-      <div class="bg-white rounded-2xl shadow p-5 flex flex-col gap-4">
-        <div class="text-4xl text-center">📺</div>
-        <h4 class="text-lg font-bold text-center">مشاهدة إعلان</h4>
-        <p class="text-center text-gray-500">شاهد الإعلان للنهاية واحصل على نقاط</p>
-
-        <div class="flex justify-between text-sm">
-          <span>⏱ 5 ثواني</span>
-          <span>🎁 10 نقاط</span>
-        </div>
-
-        <button class="mt-auto bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-xl">
-          ابدأ المهمة
-        </button>
-      </div>
-
-      <!-- Empty State -->
-      <!-- يظهر لو مفيش مهام -->
-      <!--
-      <div class="col-span-full text-center text-gray-400 py-10">
-        لا توجد مهام جديدة حاليًا
-      </div>
-      -->
-
+    <div id="noTasks"
+      class="hidden text-center text-gray-500 py-10">
+      لا توجد مهام جديدة حاليًا
     </div>
   </section>
 
-  <!-- Wallet Section -->
-  <section class="bg-white rounded-2xl shadow p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div>
-      <h3 class="text-lg font-bold">💰 رصيدك</h3>
-      <p class="text-2xl font-bold text-emerald-600">
-        <span id="walletPoints">0</span> نقطة
-      </p>
-      <p class="text-sm text-gray-500">≈ 0.00 USD</p>
+  <!-- Wallet -->
+  <section class="mt-10">
+    <div class="bg-white rounded-2xl p-6 shadow flex items-center justify-between">
+      <div>
+        <p class="text-gray-500 text-sm">رصيدك الحالي</p>
+        <h4 class="text-2xl font-bold">
+          <span id="walletPoints">0</span> نقطة
+        </h4>
+        <p class="text-xs text-gray-400">≈ 0.00 USD</p>
+      </div>
+      <button
+        class="bg-primary text-white px-6 py-2 rounded-xl hover:bg-emerald-600">
+        سحب
+      </button>
     </div>
-
-    <button class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl">
-      سحب
-    </button>
   </section>
 
 </main>
 
 <!-- ================= Script ================= -->
 <script>
-  // Dummy Data (هيتربط بالـ API بعدين)
-  document.getElementById("userPoints").innerText = "100";
-  document.getElementById("walletPoints").innerText = "100";
-  document.getElementById("username").innerText = "Ahmed";
+const API = "https://task-to-earn.onrender.com";
+const token = localStorage.getItem("token");
 
-  const menuBtn = document.getElementById("menuBtn");
-  const sideMenu = document.getElementById("sideMenu");
-  const overlay = document.getElementById("overlay");
+if (!token) {
+  window.location.href = "login.html";
+}
 
-  menuBtn.onclick = () => {
-    sideMenu.classList.remove("translate-x-full");
-    overlay.classList.remove("hidden");
-  };
+// Sidebar
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+document.getElementById("menuBtn").onclick = () => {
+  sidebar.classList.remove("translate-x-full");
+  overlay.classList.remove("hidden");
+};
+overlay.onclick = () => {
+  sidebar.classList.add("translate-x-full");
+  overlay.classList.add("hidden");
+};
 
-  overlay.onclick = () => {
-    sideMenu.classList.add("translate-x-full");
-    overlay.classList.add("hidden");
-  };
+// Logout
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
 
-  const profileBtn = document.getElementById("profileBtn");
-  const profileMenu = document.getElementById("profileMenu");
+// ================= Load User =================
+async function loadUser() {
+  const res = await fetch(`${API}/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
 
-  profileBtn.onclick = () => {
-    profileMenu.classList.toggle("hidden");
-  };
+  document.getElementById("username").innerText = data.user.username;
+  document.getElementById("userPoints").innerText = data.user.points;
+  document.getElementById("walletPoints").innerText = data.user.points;
+}
 
-  function logout() {
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
+// ================= Load Tasks =================
+async function loadTasks() {
+  const container = document.getElementById("tasksContainer");
+  const empty = document.getElementById("noTasks");
+  container.innerHTML = "";
+
+  const res = await fetch(`${API}/tasks/ads`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const data = await res.json();
+
+  if (!data.tasks.length) {
+    empty.classList.remove("hidden");
+    return;
   }
+
+  empty.classList.add("hidden");
+
+  data.tasks.forEach(task => {
+    const card = document.createElement("div");
+    card.className = "bg-white rounded-2xl shadow p-5 flex flex-col gap-4 hover:shadow-lg transition";
+
+    card.innerHTML = `
+      <div class="text-4xl text-center">📺</div>
+      <h4 class="text-lg font-bold text-center">${task.title}</h4>
+      <p class="text-center text-gray-500">${task.description}</p>
+
+      <div class="flex justify-between text-sm">
+        <span>⏱ ${task.duration_seconds} ثواني</span>
+        <span>🎁 ${task.reward_points} نقاط</span>
+      </div>
+
+      <button
+        class="mt-auto bg-primary hover:bg-emerald-600 text-white py-2 rounded-xl"
+        onclick="startTask(${task.id}, ${task.duration_seconds})">
+        ابدأ المهمة
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ================= Start Task =================
+async function startTask(taskId, duration) {
+  await fetch(`${API}/tasks/ads/start/${taskId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  alert(`شاهد الإعلان لمدة ${duration} ثواني`);
+  setTimeout(() => completeTask(taskId), duration * 1000);
+}
+
+// ================= Complete Task =================
+async function completeTask(taskId) {
+  const res = await fetch(`${API}/tasks/ads/complete/${taskId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const data = await res.json();
+
+  if (data.status === "success") {
+    alert(`+${data.reward_points} نقاط`);
+    loadUser();
+    loadTasks();
+  } else {
+    alert(data.message);
+  }
+}
+
+// Init
+loadUser();
+loadTasks();
 </script>
 
 </body>

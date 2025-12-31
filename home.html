@@ -24,12 +24,13 @@ body{
   background:linear-gradient(135deg,#ecfdf5,#f0fdfa);
   color:var(--text);
   min-height:100vh;
-  padding-bottom:80px;
+  padding-bottom:90px;
 }
 
-/* ===== HEADER ===== */
+/* HEADER */
 header{
-  position:sticky;top:0;z-index:10;
+  position:sticky;
+  top:0;
   background:#fff;
   box-shadow:0 4px 15px rgba(0,0,0,.05);
 }
@@ -53,7 +54,7 @@ header{
   color:var(--green-dark);
 }
 
-/* ===== MAIN ===== */
+/* MAIN */
 main{
   max-width:1100px;
   margin:auto;
@@ -73,7 +74,7 @@ main{
   margin:20px 0 15px;
 }
 
-/* ===== TASKS ===== */
+/* TASKS */
 .tasks-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -86,7 +87,7 @@ main{
   padding:22px;
   box-shadow:var(--shadow);
   text-align:center;
-  animation:fadeUp .5s ease;
+  animation:fadeUp .4s ease;
 }
 
 .card .icon{font-size:44px}
@@ -112,14 +113,14 @@ main{
 
 .btn:disabled{background:#94a3b8}
 
-/* ===== EMPTY STATE ===== */
+/* EMPTY */
 .empty{
   text-align:center;
   color:var(--muted);
   padding:40px 10px;
 }
 
-/* ===== COMPLETED ===== */
+/* COMPLETED */
 .completed-item{
   background:#f0fdf4;
   padding:14px;
@@ -130,16 +131,19 @@ main{
   font-size:14px;
 }
 
-.completed-item span{color:var(--green-dark);font-weight:700}
+.completed-item span{
+  color:var(--green-dark);
+  font-weight:700;
+}
 
-/* ===== BOTTOM NAV ===== */
+/* BOTTOM NAV */
 .bottom-nav{
   position:fixed;
   bottom:0;left:0;right:0;
   background:#fff;
   display:flex;
   justify-content:space-around;
-  padding:10px 0;
+  padding:12px 0;
   box-shadow:0 -4px 15px rgba(0,0,0,.08);
 }
 
@@ -192,10 +196,9 @@ main{
 
 </main>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button class="active" onclick="showNew()">🆕 المهام</button>
-  <button onclick="showCompleted()">✅ المكتملة</button>
+  <button class="active" onclick="showNew(event)">🆕 المهام</button>
+  <button onclick="showCompleted(event)">✅ المكتملة</button>
 </nav>
 
 <script>
@@ -206,12 +209,12 @@ if(!token)location.href="index.html";
 const tasksBox=document.getElementById("tasksBox");
 const completedBox=document.getElementById("completedBox");
 
-/* ===== LOAD USER ===== */
+/* USER */
 fetch(API+"/me",{headers:{Authorization:"Bearer "+token}})
 .then(r=>r.json())
 .then(d=>document.getElementById("userPoints").innerText=d.user.points);
 
-/* ===== LOAD TASKS ===== */
+/* LOAD TASKS */
 fetch(API+"/tasks/ads",{headers:{Authorization:"Bearer "+token}})
 .then(r=>r.json())
 .then(d=>{
@@ -222,7 +225,7 @@ fetch(API+"/tasks/ads",{headers:{Authorization:"Bearer "+token}})
 
   d.tasks.forEach(t=>{
     tasksBox.innerHTML+=`
-    <div class="card">
+    <div class="card" data-id="${t.id}">
       <div class="icon">📺</div>
       <h3>${t.title}</h3>
       <p>${t.description||""}</p>
@@ -230,55 +233,68 @@ fetch(API+"/tasks/ads",{headers:{Authorization:"Bearer "+token}})
         <span>⏱ ${t.duration_seconds}s</span>
         <span>🎁 ${t.reward_points}</span>
       </div>
-      <button class="btn" onclick="startTask(${t.id},this)">ابدأ</button>
+      <button class="btn"
+        onclick="startTask(${t.id}, this.closest('.card'), ${t.reward_points})">
+        ابدأ
+      </button>
     </div>`;
   });
 });
 
-/* ===== START TASK ===== */
-function startTask(id,btn){
+/* START */
+function startTask(id, card, points){
+  const btn=card.querySelector(".btn");
   btn.disabled=true;
   btn.innerText="⏳ جاري التنفيذ";
-  fetch(API+"/tasks/ads/start/"+id,{method:"POST",headers:{Authorization:"Bearer "+token}})
-  .then(()=>setTimeout(()=>completeTask(id),5000));
+
+  fetch(API+"/tasks/ads/start/"+id,{
+    method:"POST",
+    headers:{Authorization:"Bearer "+token}
+  })
+  .then(()=>setTimeout(()=>completeTask(id,card,points),5000));
 }
 
-function completeTask(id){
-  fetch(API+"/tasks/ads/complete/"+id,{method:"POST",headers:{Authorization:"Bearer "+token}})
-  .then(()=>location.reload());
-}
-
-/* ===== COMPLETED ===== */
-function showCompleted(){
-  document.getElementById("newTasksSection").style.display="none";
-  document.getElementById("completedSection").style.display="block";
-  document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
-
-  completedBox.innerHTML="";
-  fetch(API+"/tasks/my",{headers:{Authorization:"Bearer "+token}})
+/* COMPLETE */
+function completeTask(id, card, points){
+  fetch(API+"/tasks/ads/complete/"+id,{
+    method:"POST",
+    headers:{Authorization:"Bearer "+token}
+  })
   .then(r=>r.json())
   .then(d=>{
-    const done=d.tasks.filter(t=>t.status==="completed");
-    if(!done.length){
-      completedBox.innerHTML=`<div class="empty">لا توجد مهام مكتملة بعد</div>`;
-      return;
+    if(d.status!=="success")return;
+
+    card.remove();
+
+    if(!tasksBox.children.length){
+      tasksBox.innerHTML=`<div class="empty">لا توجد مهام جديدة حاليًا</div>`;
     }
-    done.forEach(t=>{
-      completedBox.innerHTML+=`
+
+    completedBox.insertAdjacentHTML("afterbegin",`
       <div class="completed-item">
-        <div>📺 مهمة ${t.task_id}</div>
-        <span>+${t.points||0}</span>
-      </div>`;
-    });
+        <div>📺 مهمة ${id}</div>
+        <span>+${points}</span>
+      </div>
+    `);
+
+    document.getElementById("userPoints").innerText =
+      parseInt(document.getElementById("userPoints").innerText) + points;
   });
 }
 
-function showNew(){
+/* NAV */
+function showCompleted(e){
+  document.getElementById("newTasksSection").style.display="none";
+  document.getElementById("completedSection").style.display="block";
+  document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active");
+}
+
+function showNew(e){
   document.getElementById("completedSection").style.display="none";
   document.getElementById("newTasksSection").style.display="block";
   document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
+  e.target.classList.add("active");
 }
 </script>
 

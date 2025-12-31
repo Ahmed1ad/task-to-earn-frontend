@@ -77,3 +77,50 @@ function logout() {
 }
 
 window.logout = logout;
+
+
+
+
+
+/* =========================
+   إنشاء حساب
+========================= */
+const registerBtn = document.getElementById("registerBtn");
+
+if (registerBtn) {
+  registerBtn.onclick = async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const msg = document.getElementById("msg");
+
+    if (!email || !password) {
+      msg.innerText = "من فضلك أدخل الإيميل والباسورد";
+      return;
+    }
+
+    msg.innerText = "جاري إنشاء الحساب...";
+
+    try {
+      const res = await fetch(API + "/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: email.split("@")[0], // اسم افتراضي
+          email,
+          password
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        msg.innerText = "✅ تم إنشاء الحساب، يمكنك تسجيل الدخول الآن";
+      } else {
+        msg.innerText = data.message || "فشل إنشاء الحساب";
+      }
+
+    } catch {
+      msg.innerText = "خطأ في الاتصال بالسيرفر";
+    }
+  };
+}

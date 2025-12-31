@@ -82,16 +82,78 @@ window.logout = logout;
 
 
 
-/* =========================
-   إنشاء حساب
-========================= */
-const registerBtn = document.getElementById("registerBtn");
 
-if (registerBtn) {
-  registerBtn.onclick = async () => {
+
+/* =====================================
+   TaskToEarn - main.js (SUPER SIMPLE)
+===================================== */
+
+const API = "https://task-to-earn.onrender.com";
+const token = localStorage.getItem("token");
+const page = location.pathname;
+
+/* =========================
+   حماية صفحة home فقط
+========================= */
+if (page.includes("home.html") && !token) {
+  location.replace("index.html");
+}
+
+/* =========================
+   بعد تحميل الصفحة
+========================= */
+document.addEventListener("DOMContentLoaded", () => {
+
+  /* ===== تسجيل الدخول ===== */
+  const loginBtn = document.getElementById("loginBtn");
+  const registerBtn = document.getElementById("registerBtn");
+  const msg = document.getElementById("msg");
+
+  if (loginBtn) {
+    loginBtn.onclick = login;
+  }
+
+  if (registerBtn) {
+    registerBtn.onclick = register;
+  }
+
+  /* ===== دالة تسجيل الدخول ===== */
+  async function login() {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
-    const msg = document.getElementById("msg");
+
+    if (!email || !password) {
+      msg.innerText = "من فضلك أدخل الإيميل والباسورد";
+      return;
+    }
+
+    msg.innerText = "جاري تسجيل الدخول...";
+
+    try {
+      const res = await fetch(API + "/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        localStorage.setItem("token", data.token);
+        location.replace("home.html");
+      } else {
+        msg.innerText = data.message || "بيانات غير صحيحة";
+      }
+
+    } catch {
+      msg.innerText = "خطأ في الاتصال بالسيرفر";
+    }
+  }
+
+  /* ===== دالة إنشاء الحساب ===== */
+  async function register() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     if (!email || !password) {
       msg.innerText = "من فضلك أدخل الإيميل والباسورد";
@@ -105,7 +167,7 @@ if (registerBtn) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: email.split("@")[0], // اسم افتراضي
+          username: email.split("@")[0],
           email,
           password
         })
@@ -114,7 +176,7 @@ if (registerBtn) {
       const data = await res.json();
 
       if (data.status === "success") {
-        msg.innerText = "✅ تم إنشاء الحساب، يمكنك تسجيل الدخول الآن";
+        msg.innerText = "✅ تم إنشاء الحساب، سجل دخول الآن";
       } else {
         msg.innerText = data.message || "فشل إنشاء الحساب";
       }
@@ -122,5 +184,16 @@ if (registerBtn) {
     } catch {
       msg.innerText = "خطأ في الاتصال بالسيرفر";
     }
-  };
+  }
+
+});
+
+/* =========================
+   تسجيل الخروج (home)
+========================= */
+function logout() {
+  localStorage.removeItem("token");
+  location.replace("index.html");
 }
+
+window.logout = logout;

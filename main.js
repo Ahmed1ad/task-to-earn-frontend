@@ -1,175 +1,26 @@
 /* =================================================
-   TaskToEarn - main.js (Final)
-   Works with home.html (HTML + CSS only)
+   TaskToEarn - main.js (NO REFRESH LOOP)
 ================================================= */
 
 const API = "https://task-to-earn.onrender.com";
 const token = localStorage.getItem("token");
+const page = location.pathname;
 
 /* =========================
-   Auth Guard
+   PAGE GUARDS (IMPORTANT)
 ========================= */
-if (!token) {
-  location.href = "index.html";
+
+// ✅ لو احنا في صفحة home ومفيش توكن → رجوع للوجن
+if (page.includes("home") && !token) {
+  location.replace("index.html");
 }
 
-/* =========================
-   DOM Elements
-========================= */
-const pointsEl = document.getElementById("userPoints");
-const startBtn = document.getElementById("startBtn");
+// ❌ ممنوع أي redirect في صفحة اللوجن
+// صفحة index.html لازم تفضل ساكنة
 
 /* =========================
-   Init
+   LOGIN (index.html)
 ========================= */
-document.addEventListener("DOMContentLoaded", () => {
-  loadUser();
-});
-
-/* =========================
-   Load User Data
-========================= */
-async function loadUser() {
-  try {
-    const res = await fetch(`${API}/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    if (data.status === "success" && pointsEl) {
-      pointsEl.innerText = data.user.points;
-    }
-
-  } catch (err) {
-    console.error("Failed to load user", err);
-  }
-}
-
-/* =========================
-   Start Task
-========================= */
-async function startTask(taskId) {
-  if (!startBtn || startBtn.disabled) return;
-
-  startBtn.disabled = true;
-  startBtn.innerText = "⏳ جاري المشاهدة...";
-
-  try {
-    const res = await fetch(`${API}/tasks/ads/start/${taskId}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    if (data.status !== "success") {
-      throw new Error(data.message || "فشل بدء المهمة");
-    }
-
-    startCountdown(taskId, 5);
-
-  } catch (err) {
-    alert(err.message);
-    resetButton();
-  }
-}
-
-/* =========================
-   Countdown + Progress
-========================= */
-function startCountdown(taskId, duration) {
-  let remaining = duration;
-  let elapsed = 0;
-
-  startBtn.innerHTML = `
-    <div style="font-size:14px;margin-bottom:6px">⏱ ${remaining} ثواني</div>
-    <div style="width:100%;height:6px;background:#e5e7eb;border-radius:999px;overflow:hidden">
-      <div id="progressBar" style="
-        width:0%;
-        height:100%;
-        background:#22c55e;
-        transition:width 1s linear
-      "></div>
-    </div>
-  `;
-
-  const bar = document.getElementById("progressBar");
-
-  const timer = setInterval(() => {
-    elapsed++;
-    remaining--;
-
-    bar.style.width = `${(elapsed / duration) * 100}%`;
-    startBtn.querySelector("div").innerText = `⏱ ${remaining} ثواني`;
-
-    if (elapsed >= duration) {
-      clearInterval(timer);
-      completeTask(taskId);
-    }
-  }, 1000);
-}
-
-/* =========================
-   Complete Task
-========================= */
-async function completeTask(taskId) {
-  try {
-    const res = await fetch(`${API}/tasks/ads/complete/${taskId}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    if (data.status === "success") {
-      alert("🎉 تم تنفيذ المهمة بنجاح");
-      await loadUser();
-      resetButton("✅ تمت");
-    } else {
-      throw new Error(data.message || "فشل إكمال المهمة");
-    }
-
-  } catch (err) {
-    alert(err.message);
-    resetButton();
-  }
-}
-
-/* =========================
-   Reset Button
-========================= */
-function resetButton(text = "ابدأ المهمة") {
-  startBtn.disabled = false;
-  startBtn.innerText = text;
-}
-
-/* =========================
-   Logout
-========================= */
-function logout() {
-  localStorage.removeItem("token");
-  location.href = "index.html";
-}
-
-/* =========================
-   Expose Functions
-========================= */
-window.startTask = startTask;
-window.logout = logout;
-
-
-
-
-
-
-
 const loginBtn = document.getElementById("loginBtn");
 
 if (loginBtn) {
@@ -177,16 +28,19 @@ if (loginBtn) {
 }
 
 async function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email = document.getElementById("email")?.value.trim();
+  const password = document.getElementById("password")?.value.trim();
+  const msg = document.getElementById("msg");
 
   if (!email || !password) {
-    alert("من فضلك أدخل البريد الإلكتروني وكلمة المرور");
+    msg.innerText = "من فضلك أدخل البريد الإلكتروني وكلمة المرور";
     return;
   }
 
+  msg.innerText = "جاري تسجيل الدخول...";
+
   try {
-    const res = await fetch("https://task-to-earn.onrender.com/auth/login", {
+    const res = await fetch(`${API}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
@@ -196,12 +50,90 @@ async function login() {
 
     if (data.status === "success") {
       localStorage.setItem("token", data.token);
-      location.href = "home.html";
+      location.replace("home.html");
     } else {
-      alert(data.message || "بيانات الدخول غير صحيحة");
+      msg.innerText = data.message || "بيانات الدخول غير صحيحة";
     }
 
-  } catch (err) {
-    alert("خطأ في الاتصال بالسيرفر");
+  } catch (e) {
+    msg.innerText = "خطأ في الاتصال بالسيرفر";
   }
+}
+
+/* =========================
+   HOME PAGE (home.html)
+========================= */
+if (page.includes("home") && token) {
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadUser();
+  });
+
+  async function loadUser() {
+    try {
+      const res = await fetch(`${API}/me`, {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const data = await res.json();
+
+      if (data.status === "success") {
+        document.getElementById("userPoints").innerText = data.user.points;
+      }
+    } catch (e) {
+      console.error("Load user failed");
+    }
+  }
+
+  window.startTask = async function (taskId) {
+    const btn = document.getElementById("startBtn");
+    if (btn.disabled) return;
+
+    btn.disabled = true;
+    btn.innerText = "⏳ جاري المشاهدة...";
+
+    try {
+      const res = await fetch(`${API}/tasks/ads/start/${taskId}`, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      const data = await res.json();
+      if (data.status !== "success") throw new Error();
+
+      setTimeout(() => completeTask(taskId), 5000);
+
+    } catch {
+      btn.disabled = false;
+      btn.innerText = "ابدأ المهمة";
+    }
+  };
+
+  async function completeTask(taskId) {
+    const btn = document.getElementById("startBtn");
+
+    try {
+      const res = await fetch(`${API}/tasks/ads/complete/${taskId}`, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        alert("🎉 تم تنفيذ المهمة");
+        location.reload();
+      } else {
+        throw new Error();
+      }
+
+    } catch {
+      btn.disabled = false;
+      btn.innerText = "ابدأ المهمة";
+    }
+  }
+
+  window.logout = function () {
+    localStorage.removeItem("token");
+    location.replace("index.html");
+  };
 }

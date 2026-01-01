@@ -346,48 +346,43 @@ function logout() {
 
 
 /* ================= INIT ================= */
-document.getElementById("tabAvailable").onclick = loadAvailableTasks;
-document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 
-loadUser();
-loadAvailableTasks();
+(async function init() {
 
+  // 1️⃣ تحقق من الحظر أولًا
+  await checkBanStatus();
 
-const activeTask = localStorage.getItem("activeTask");
+  // 2️⃣ تحقق من مهمة نشطة سابقة
+  const activeTask = localStorage.getItem("activeTask");
 
-if (activeTask) {
-  const task = JSON.parse(activeTask);
-  const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
+  if (activeTask) {
+    const task = JSON.parse(activeTask);
+    const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
 
-  if (elapsed < task.duration) {
-    // ❌ المهمة فشلت
-    fetch(`${API}/tasks/ads/fail/${task.taskId}`, {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token
-      }
-    });
+    if (elapsed < task.duration) {
+      // ❌ المهمة فشلت
+      await fetch(`${API}/tasks/ads/fail/${task.taskId}`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      });
+
+      alert("❌ المهمة فشلت، أعد المحاولة");
+    }
 
     localStorage.removeItem("activeTask");
-    alert("❌ المهمة فشلت، أعد المحاولة");
-  } else {
-    localStorage.removeItem("activeTask");
   }
-}
 
+  // 3️⃣ ربط التابات
+  document.getElementById("tabAvailable").onclick = loadAvailableTasks;
+  document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 
-  const res = await fetch(API + "/auth/check", {
-  headers: {
-    Authorization: "Bearer " + token
-  }
-});
+  // 4️⃣ تحميل البيانات
+  await loadUser();
+  await loadAvailableTasks();
 
-const data = await res.json();
-
-if (data.status === "banned") {
-  alert("تم حظر حسابك");
-  logout();
-}
+})();
 
   
 </script>

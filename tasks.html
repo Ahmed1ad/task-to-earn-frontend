@@ -172,13 +172,17 @@ async function loadCompletedTasks() {
 
   const data = await res.json();
 
-  if (!data.tasks || data.tasks.length === 0) {
+  const completedTasks = (data.tasks || []).filter(
+    t => t.status === "completed"
+  );
+
+  if (!completedTasks.length) {
     showEmpty("لا توجد مهام مكتملة");
     return;
   }
 
   document.getElementById("tasksContainer").innerHTML =
-    data.tasks.map(completedCard).join("");
+    completedTasks.map(completedCard).join("");
 }
 /* ================= TASK FLOW ================= */
 async function startTask(task) {
@@ -376,15 +380,16 @@ function logout() {
     localStorage.removeItem("activeTask");
   }
 
-  // 3️⃣ ربط التابات
-  document.getElementById("tabAvailable").onclick = loadAvailableTasks;
-  document.getElementById("tabCompleted").onclick = loadCompletedTasks;
+document.getElementById("tabAvailable").addEventListener("click", () => {
+  loadAvailableTasks();
+});
 
-  // 4️⃣ تحميل البيانات
-  await loadUser();
-  await loadAvailableTasks();
+document.getElementById("tabCompleted").addEventListener("click", () => {
+  loadCompletedTasks();
+});
 
-})();
+loadUser();
+loadAvailableTasks();
 
   
 </script>

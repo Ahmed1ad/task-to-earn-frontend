@@ -22,7 +22,7 @@
     <button id="menuBtn" class="text-2xl">☰</button>
 
     <!-- Points -->
-    <div class="flex items-center gap-2 bg-emerald-100 px-3 py-1 rounded-full">
+    <div class="flex items-center gap-2 bg-emerald-100 px-4 py-1 rounded-full text-sm">
       🪙 <span id="userPoints" class="font-bold">0</span>
     </div>
 
@@ -35,7 +35,7 @@
 
       <!-- Profile Dropdown -->
       <div id="profileMenu"
-        class="hidden absolute left-0 mt-2 w-40 bg-white rounded-xl shadow p-2">
+        class="hidden absolute left-0 mt-2 w-40 bg-white rounded-xl shadow p-2 text-sm">
         <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded">
           حسابي
         </button>
@@ -52,26 +52,28 @@
   </div>
 </header>
 
-
-
 <!-- ================= Sidebar ================= -->
 <aside id="sidebar"
-  class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition z-50">
-  <div class="p-4 border-b font-bold">القائمة</div>
-  <nav class="p-4 flex flex-col gap-3">
-    <button class="p-3 bg-emerald-100 rounded">🏠 الرئيسية</button>
-    <button class="p-3 hover:bg-gray-100 rounded">📋 المهام</button>
-    <button class="p-3 hover:bg-gray-100 rounded">💰 السحب</button>
-    <button class="p-3 hover:bg-gray-100 rounded">🧾 السجل</button>
+  class="fixed top-0 right-0 w-64 h-full bg-white shadow-xl
+         transform translate-x-full transition-transform duration-300 z-50">
+
+  <div class="p-4 border-b flex justify-between items-center font-bold">
+    <span>القائمة</span>
+    <button onclick="closeSidebar()" class="text-xl">✕</button>
+  </div>
+
+  <nav class="p-4 flex flex-col gap-3 text-sm">
+    <a href="home.html" class="p-3 bg-emerald-100 rounded-xl">🏠 الرئيسية</a>
+    <a href="tasks.html" class="p-3 hover:bg-gray-100 rounded-xl">📋 المهام</a>
+    <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">💰 السحب</a>
+    <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">🧾 السجل</a>
   </nav>
 </aside>
 
 <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
-
-
 <!-- ================= CONTENT ================= -->
-<main class="flex-1 max-w-6xl mx-auto w-full px-4 py-6">
+<main class="flex-1 max-w-6xl mx-auto w-full px-4 pt-24 pb-6">
 
   <!-- Tabs -->
   <div class="flex gap-2 mb-6">
@@ -85,7 +87,7 @@
     </button>
   </div>
 
-  <!-- Tasks Container -->
+  <!-- Tasks -->
   <div id="tasksContainer" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     <!-- tasks here -->
   </div>
@@ -98,24 +100,21 @@
 
   <div class="bg-white w-full max-w-md rounded-2xl overflow-hidden">
 
-    <!-- Modal Header -->
     <div class="flex items-center justify-between px-4 py-3 bg-gray-100">
-      <span class="font-bold">
+      <span class="font-bold text-sm">
         الوقت المتبقي:
         <span id="timer" class="text-red-500">0</span> ث
       </span>
       <button onclick="failTask()" class="text-red-500 text-xl">✕</button>
     </div>
 
-    <!-- Ad -->
     <iframe id="adFrame" class="w-full h-80 border-none"></iframe>
 
-    <!-- Footer -->
     <div class="p-4">
       <button id="completeBtn"
         onclick="completeTask()"
         disabled
-        class="w-full py-3 rounded-xl bg-gray-300 text-white font-bold">
+        class="w-full py-3 rounded-xl bg-gray-300 text-white font-bold transition">
         إنهاء المهمة
       </button>
     </div>
@@ -139,10 +138,8 @@ async function loadUser() {
     headers: { Authorization: "Bearer " + token }
   });
   const data = await res.json();
-
   if (data.status === "success") {
-    document.getElementById("userPoints").innerText =
-      data.user.points + " نقطة";
+    document.getElementById("userPoints").innerText = data.user.points;
   }
 }
 
@@ -210,7 +207,7 @@ async function startTask(task) {
       clearInterval(timerInterval);
       document.getElementById("completeBtn").disabled = false;
       document.getElementById("completeBtn").className =
-        "w-full py-3 rounded-xl bg-green-500 text-white font-bold";
+        "w-full py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600";
     }
   }, 1000);
 }
@@ -251,7 +248,8 @@ function taskCard(t) {
 
     <button
       onclick='startTask(${JSON.stringify(t)})'
-      class="mt-auto py-2 rounded-xl bg-green-500 text-white font-bold">
+      class="mt-auto py-2 rounded-xl bg-green-500 text-white font-bold
+             hover:bg-green-600 active:scale-95 transition">
       ابدأ المهمة
     </button>
   </div>`;
@@ -293,11 +291,40 @@ function setActiveTab(tab) {
       : "flex-1 py-2 rounded-xl bg-gray-200 font-medium";
 }
 
-/* ================= EVENTS ================= */
+/* ================= SIDEBAR ================= */
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+menuBtn.onclick = () => {
+  sidebar.classList.remove("translate-x-full");
+  overlay.classList.remove("hidden");
+};
+
+function closeSidebar() {
+  sidebar.classList.add("translate-x-full");
+  overlay.classList.add("hidden");
+}
+
+overlay.onclick = closeSidebar;
+
+/* ================= PROFILE ================= */
+const profileBtn = document.getElementById("profileBtn");
+const profileMenu = document.getElementById("profileMenu");
+
+profileBtn.onclick = (e) => {
+  e.stopPropagation();
+  profileMenu.classList.toggle("hidden");
+};
+
+document.addEventListener("click", () => {
+  profileMenu.classList.add("hidden");
+});
+
+/* ================= INIT ================= */
 document.getElementById("tabAvailable").onclick = loadAvailableTasks;
 document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 
-/* ================= INIT ================= */
 loadUser();
 loadAvailableTasks();
 </script>

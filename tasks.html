@@ -246,7 +246,7 @@ async function failTask() {
 
 function closeModal() {
   clearInterval(timerInterval);
-  document.getElementById("adFrame").src = "";
+  window.open(task.ad_url, "_blank");
   document.getElementById("taskModal").classList.add("hidden");
   document.getElementById("taskModal").classList.remove("flex");
 }

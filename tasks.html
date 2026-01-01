@@ -15,7 +15,7 @@
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
 <!-- ================= HEADER ================= -->
-<header <header class="sticky top-0 w-full bg-white shadow z-50">
+<header <header class="sticky top-0 w-full bg-white shadow z-30">
   <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
     <!-- Menu -->
@@ -257,9 +257,17 @@ function taskCard(t) {
 
 function completedCard(t) {
   return `
-  <div class="bg-white rounded-2xl shadow p-4 opacity-70">
-    <h3 class="font-bold">${t.title}</h3>
-    <span class="text-green-600 text-sm">✔ مكتملة</span>
+  <div class="bg-white rounded-2xl shadow p-4 flex flex-col gap-2 opacity-80">
+
+    <h3 class="font-bold text-lg">${t.title}</h3>
+
+    <div class="flex items-center justify-between text-sm">
+      <span class="text-green-600 font-medium">✔ مكتملة</span>
+      <span class="text-emerald-600 font-bold">
+        +${t.reward_points} نقطة
+      </span>
+    </div>
+
   </div>`;
 }
 

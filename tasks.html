@@ -232,7 +232,14 @@ async function completeTask() {
   loadUser();
 }
 
-function failTask() {
+  
+async function failTask() {
+  if (currentTask) {
+    await fetch(`${API}/tasks/ads/fail/${currentTask.id}`, {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token }
+    });
+  }
   closeModal();
 }
 
@@ -346,21 +353,43 @@ loadUser();
 loadAvailableTasks();
 
 
-  const activeTask = localStorage.getItem("activeTask");
+const activeTask = localStorage.getItem("activeTask");
 
 if (activeTask) {
   const task = JSON.parse(activeTask);
   const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
 
   if (elapsed < task.duration) {
-    // المهمة فشلت
+    // ❌ المهمة فشلت
+    fetch(`${API}/tasks/ads/fail/${task.taskId}`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
+
     localStorage.removeItem("activeTask");
     alert("❌ المهمة فشلت، أعد المحاولة");
   } else {
-    // خلص وقتها بس المستخدم مكملش
     localStorage.removeItem("activeTask");
   }
 }
+
+
+  const res = await fetch(API + "/auth/check", {
+  headers: {
+    Authorization: "Bearer " + token
+  }
+});
+
+const data = await res.json();
+
+if (data.status === "banned") {
+  alert("تم حظر حسابك");
+  logout();
+}
+
+  
 </script>
 
 </body>

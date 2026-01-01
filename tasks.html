@@ -317,18 +317,10 @@ function closeSidebar() {
 
 overlay.onclick = closeSidebar;
 
-/* ================= PROFILE ================= */
-const profileBtn = document.getElementById("profileBtn");
-const profileMenu = document.getElementById("profileMenu");
-
-profileBtn.onclick = (e) => {
-  e.stopPropagation();
+// Profile dropdown
+profileBtn.onclick = () => {
   profileMenu.classList.toggle("hidden");
 };
-
-document.addEventListener("click", () => {
-  profileMenu.classList.add("hidden");
-});
 
 
 // Logout

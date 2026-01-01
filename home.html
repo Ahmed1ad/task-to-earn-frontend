@@ -162,24 +162,42 @@ async function loadUser() {
 }
 
 // Load tasks (عرض فقط – بحد أقصى مهمتين)
+
 async function loadTasks() {
-  const res = await fetch(`${API}/tasks/ads`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const data = await res.json();
+  const [adsRes, myRes] = await Promise.all([
+    fetch(`${API}/tasks/ads`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+    fetch(`${API}/tasks/my`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  ]);
+
+  const adsData = await adsRes.json();
+  const myData = await myRes.json();
+
+  // IDs المهام اللي المستخدم عملها
+  const completedTaskIds = new Set(
+    myData.tasks.map(t => t.task_id)
+  );
+
+  // فلترة المهام الجديدة فقط
+  const newTasks = adsData.tasks.filter(
+    task => !completedTaskIds.has(task.id)
+  );
 
   tasksContainer.innerHTML = "";
 
-  const tasks = data.tasks.slice(0, 2);
+  const tasksToShow = newTasks.slice(0, 2);
 
-  if (!tasks.length) {
+  if (!tasksToShow.length) {
     noTasks.classList.remove("hidden");
     return;
   }
 
   noTasks.classList.add("hidden");
 
-  tasks.forEach(task => {
+  tasksToShow.forEach(task => {
     const card = document.createElement("div");
     card.className = "bg-white rounded-2xl shadow p-5 flex flex-col gap-4";
 
@@ -203,6 +221,7 @@ async function loadTasks() {
     tasksContainer.appendChild(card);
   });
 }
+
 
 loadUser();
 loadTasks();

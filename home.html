@@ -52,7 +52,7 @@
         </button>
         <button onclick="logout()"
           class="w-full text-right px-3 py-2 hover:bg-red-100 text-red-600 rounded">
-          خروج
+          تسجيل خروج
         </button>
       </div>
     </div>
@@ -75,17 +75,17 @@
 <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
 <!-- ================= Main ================= -->
-<main class="pt-24 max-w-6xl mx-auto px-4">
+<main class="pt-24 max-w-6xl mx-auto px-4 space-y-10">
 
   <!-- Welcome -->
-  <div class="bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-2xl p-6 mb-8 shadow">
+  <div class="bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-2xl p-6 shadow">
     <h2 class="text-2xl font-bold mb-1">
       👋 مرحبًا <span id="username">...</span>
     </h2>
-    <p>هذه الصفحة لعرض المهام الجديدة فقط</p>
+    <p>الصفحة الرئيسية لعرض المهام الجديدة فقط</p>
   </div>
 
-  <!-- Tasks -->
+  <!-- Tasks Section -->
   <section>
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-xl font-bold">📺 المهام الجديدة</h3>
@@ -94,13 +94,29 @@
       </button>
     </div>
 
-    <div id="tasksContainer"
-      class="grid gap-6 sm:grid-cols-2"></div>
+    <div id="tasksContainer" class="grid gap-6 sm:grid-cols-2"></div>
 
-    <div id="noTasks"
-      class="hidden text-center text-gray-500 py-10">
+    <div id="noTasks" class="hidden text-center text-gray-500 py-10">
       لا توجد مهام متاحة الآن
     </div>
+  </section>
+
+  <!-- Wallet Section (موجودة كما هي ولم تُحذف) -->
+  <section class="bg-white rounded-2xl p-6 shadow flex items-center justify-between">
+    <div>
+      <p class="text-gray-500 text-sm">رصيدك الحالي</p>
+      <h4 class="text-2xl font-bold">
+        <span id="walletPoints">0</span> نقطة
+      </h4>
+      <p class="text-xs text-gray-400">≈ 0.00 USD</p>
+    </div>
+
+    <!-- زر السحب (لم يتم حذفه) -->
+    <button
+      class="bg-primary text-white px-6 py-3 rounded-xl hover:bg-emerald-600"
+      onclick="location.href='withdraw.html'">
+      سحب
+    </button>
   </section>
 
 </main>
@@ -122,7 +138,7 @@ overlay.onclick = () => {
   overlay.classList.add("hidden");
 };
 
-// Profile menu
+// Profile dropdown
 profileBtn.onclick = () => {
   profileMenu.classList.toggle("hidden");
 };
@@ -139,11 +155,13 @@ async function loadUser() {
     headers: { Authorization: `Bearer ${token}` }
   });
   const data = await res.json();
+
   username.innerText = data.user.username;
   userPoints.innerText = data.user.points;
+  walletPoints.innerText = data.user.points;
 }
 
-// Load tasks (عرض فقط – بحد أقصى 2)
+// Load tasks (عرض فقط – بحد أقصى مهمتين)
 async function loadTasks() {
   const res = await fetch(`${API}/tasks/ads`, {
     headers: { Authorization: `Bearer ${token}` }
@@ -163,8 +181,7 @@ async function loadTasks() {
 
   tasks.forEach(task => {
     const card = document.createElement("div");
-    card.className =
-      "bg-white rounded-2xl shadow p-5 flex flex-col gap-4";
+    card.className = "bg-white rounded-2xl shadow p-5 flex flex-col gap-4";
 
     card.innerHTML = `
       <div class="text-4xl text-center">📺</div>
@@ -182,6 +199,7 @@ async function loadTasks() {
         ابدأ المهمة
       </button>
     `;
+
     tasksContainer.appendChild(card);
   });
 }

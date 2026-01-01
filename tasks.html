@@ -152,6 +152,7 @@ async function loadAvailableTasks() {
   const res = await fetch(API + "/tasks/ads", {
     headers: { Authorization: "Bearer " + token }
   });
+
   const data = await res.json();
 
   if (!data.tasks || data.tasks.length === 0) {
@@ -173,18 +174,13 @@ async function loadCompletedTasks() {
 
   const data = await res.json();
 
-  // فلترة المهام المكتملة في الفرونت
-  const completedTasks = (data.tasks || []).filter(
-    task => task.status === "completed"
-  );
-
-  if (!completedTasks.length) {
+  if (!data.tasks || data.tasks.length === 0) {
     showEmpty("لا توجد مهام مكتملة");
     return;
   }
 
   document.getElementById("tasksContainer").innerHTML =
-    completedTasks.map(completedCard).join("");
+    data.tasks.map(completedCard).join("");
 }
 /* ================= TASK FLOW ================= */
 async function startTask(task) {
@@ -302,8 +298,11 @@ function showSkeleton() {
 
 function showEmpty(text) {
   document.getElementById("tasksContainer").innerHTML = `
-    <div class="col-span-full text-center text-gray-500 mt-10">
-      ${text}
+    <div class="col-span-full flex flex-col items-center justify-center mt-20 text-center">
+      <div class="text-gray-600 text-lg font-medium">${text}</div>
+      <div class="text-sm text-gray-400 mt-2">
+        انتظر مهام جديدة أو عد لاحقًا
+      </div>
     </div>
   `;
 }

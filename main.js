@@ -6,10 +6,13 @@ const API = "https://task-to-earn.onrender.com";
 const token = localStorage.getItem("token");
 const page = location.pathname;
 
-// حماية home فقط
-if (page.includes("home") && !token) {
+// الصفحات اللي محتاجة تسجيل دخول
+const protectedPages = ["home", "tasks", "withdraw", "profile"];
+
+if (protectedPages.some(p => page.includes(p)) && !token) {
   location.replace("login.html");
 }
+
 
 // عناصر الصفحة
 const actionBtn = document.getElementById("actionBtn");

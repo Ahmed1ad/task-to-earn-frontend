@@ -5,9 +5,8 @@
   <title>TaskToEarn | الرئيسية</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Tailwind CDN -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script>
     tailwind.config = {
       theme: {
@@ -21,44 +20,58 @@
   </script>
 </head>
 
-<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen font-sans">
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
 
 <!-- ================= Header ================= -->
 <header class="fixed top-0 w-full bg-white shadow z-50">
   <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-    
-    <!-- Menu Button -->
+
+    <!-- Menu -->
     <button id="menuBtn" class="text-2xl">☰</button>
 
     <!-- Points -->
     <div class="flex items-center gap-2 bg-emerald-100 px-3 py-1 rounded-full">
-      <span>🪙</span>
-      <span id="userPoints" class="font-bold">0</span>
+      🪙 <span id="userPoints" class="font-bold">0</span>
     </div>
 
     <!-- Profile -->
-    <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer">
-      👤
+    <div class="relative">
+      <button id="profileBtn"
+        class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+        👤
+      </button>
+
+      <!-- Profile Dropdown -->
+      <div id="profileMenu"
+        class="hidden absolute left-0 mt-2 w-40 bg-white rounded-xl shadow p-2">
+        <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded">
+          حسابي
+        </button>
+        <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded">
+          السحب
+        </button>
+        <button onclick="logout()"
+          class="w-full text-right px-3 py-2 hover:bg-red-100 text-red-600 rounded">
+          خروج
+        </button>
+      </div>
     </div>
+
   </div>
 </header>
 
 <!-- ================= Sidebar ================= -->
 <aside id="sidebar"
-  class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform z-50">
-
-  <div class="p-4 border-b font-bold text-lg">القائمة</div>
-
+  class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition z-50">
+  <div class="p-4 border-b font-bold">القائمة</div>
   <nav class="p-4 flex flex-col gap-3">
-    <button class="text-right p-3 rounded-lg bg-emerald-100">🏠 الرئيسية</button>
-    <button class="text-right p-3 rounded-lg hover:bg-gray-100">📋 المهام</button>
-    <button class="text-right p-3 rounded-lg hover:bg-gray-100">💰 السحب</button>
-    <button class="text-right p-3 rounded-lg hover:bg-gray-100">🧾 السجل</button>
-    <button onclick="logout()" class="text-right p-3 rounded-lg bg-red-100 text-red-600">🚪 خروج</button>
+    <button class="p-3 bg-emerald-100 rounded">🏠 الرئيسية</button>
+    <button class="p-3 hover:bg-gray-100 rounded">📋 المهام</button>
+    <button class="p-3 hover:bg-gray-100 rounded">💰 السحب</button>
+    <button class="p-3 hover:bg-gray-100 rounded">🧾 السجل</button>
   </nav>
 </aside>
 
-<!-- Overlay -->
 <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
 <!-- ================= Main ================= -->
@@ -66,37 +79,27 @@
 
   <!-- Welcome -->
   <div class="bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-2xl p-6 mb-8 shadow">
-    <h2 class="text-2xl font-bold mb-2">👋 مرحبًا <span id="username">...</span></h2>
-    <p>نفّذ المهام البسيطة واربح نقاط قابلة للسحب</p>
+    <h2 class="text-2xl font-bold mb-1">
+      👋 مرحبًا <span id="username">...</span>
+    </h2>
+    <p>هذه الصفحة لعرض المهام الجديدة فقط</p>
   </div>
 
   <!-- Tasks -->
   <section>
-    <h3 class="text-xl font-bold mb-4">📺 المهام المتاحة</h3>
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-xl font-bold">📺 المهام الجديدة</h3>
+      <button class="text-primary font-semibold">
+        عرض المزيد →
+      </button>
+    </div>
 
     <div id="tasksContainer"
-      class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"></div>
+      class="grid gap-6 sm:grid-cols-2"></div>
 
     <div id="noTasks"
       class="hidden text-center text-gray-500 py-10">
-      لا توجد مهام جديدة حاليًا
-    </div>
-  </section>
-
-  <!-- Wallet -->
-  <section class="mt-10">
-    <div class="bg-white rounded-2xl p-6 shadow flex items-center justify-between">
-      <div>
-        <p class="text-gray-500 text-sm">رصيدك الحالي</p>
-        <h4 class="text-2xl font-bold">
-          <span id="walletPoints">0</span> نقطة
-        </h4>
-        <p class="text-xs text-gray-400">≈ 0.00 USD</p>
-      </div>
-      <button
-        class="bg-primary text-white px-6 py-2 rounded-xl hover:bg-emerald-600">
-        سحب
-      </button>
+      لا توجد مهام متاحة الآن
     </div>
   </section>
 
@@ -107,14 +110,10 @@
 const API = "https://task-to-earn.onrender.com";
 const token = localStorage.getItem("token");
 
-if (!token) {
-  window.location.href = "login.html";
-}
+if (!token) location.href = "login.html";
 
 // Sidebar
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-document.getElementById("menuBtn").onclick = () => {
+menuBtn.onclick = () => {
   sidebar.classList.remove("translate-x-full");
   overlay.classList.remove("hidden");
 };
@@ -123,46 +122,49 @@ overlay.onclick = () => {
   overlay.classList.add("hidden");
 };
 
+// Profile menu
+profileBtn.onclick = () => {
+  profileMenu.classList.toggle("hidden");
+};
+
 // Logout
 function logout() {
   localStorage.removeItem("token");
-  window.location.href = "login.html";
+  location.href = "login.html";
 }
 
-// ================= Load User =================
+// Load user
 async function loadUser() {
   const res = await fetch(`${API}/me`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   const data = await res.json();
-
-  document.getElementById("username").innerText = data.user.username;
-  document.getElementById("userPoints").innerText = data.user.points;
-  document.getElementById("walletPoints").innerText = data.user.points;
+  username.innerText = data.user.username;
+  userPoints.innerText = data.user.points;
 }
 
-// ================= Load Tasks =================
+// Load tasks (عرض فقط – بحد أقصى 2)
 async function loadTasks() {
-  const container = document.getElementById("tasksContainer");
-  const empty = document.getElementById("noTasks");
-  container.innerHTML = "";
-
   const res = await fetch(`${API}/tasks/ads`, {
     headers: { Authorization: `Bearer ${token}` }
   });
-
   const data = await res.json();
 
-  if (!data.tasks.length) {
-    empty.classList.remove("hidden");
+  tasksContainer.innerHTML = "";
+
+  const tasks = data.tasks.slice(0, 2);
+
+  if (!tasks.length) {
+    noTasks.classList.remove("hidden");
     return;
   }
 
-  empty.classList.add("hidden");
+  noTasks.classList.add("hidden");
 
-  data.tasks.forEach(task => {
+  tasks.forEach(task => {
     const card = document.createElement("div");
-    card.className = "bg-white rounded-2xl shadow p-5 flex flex-col gap-4 hover:shadow-lg transition";
+    card.className =
+      "bg-white rounded-2xl shadow p-5 flex flex-col gap-4";
 
     card.innerHTML = `
       <div class="text-4xl text-center">📺</div>
@@ -175,45 +177,15 @@ async function loadTasks() {
       </div>
 
       <button
-        class="mt-auto bg-primary hover:bg-emerald-600 text-white py-2 rounded-xl"
-        onclick="startTask(${task.id}, ${task.duration_seconds})">
+        class="bg-primary text-white py-2 rounded-xl hover:bg-emerald-600"
+        onclick="location.href='tasks.html'">
         ابدأ المهمة
       </button>
     `;
-    container.appendChild(card);
+    tasksContainer.appendChild(card);
   });
 }
 
-// ================= Start Task =================
-async function startTask(taskId, duration) {
-  await fetch(`${API}/tasks/ads/start/${taskId}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  alert(`شاهد الإعلان لمدة ${duration} ثواني`);
-  setTimeout(() => completeTask(taskId), duration * 1000);
-}
-
-// ================= Complete Task =================
-async function completeTask(taskId) {
-  const res = await fetch(`${API}/tasks/ads/complete/${taskId}`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  const data = await res.json();
-
-  if (data.status === "success") {
-    alert(`+${data.reward_points} نقاط`);
-    loadUser();
-    loadTasks();
-  } else {
-    alert(data.message);
-  }
-}
-
-// Init
 loadUser();
 loadTasks();
 </script>

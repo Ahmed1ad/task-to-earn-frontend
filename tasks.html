@@ -167,20 +167,25 @@ async function loadCompletedTasks() {
   setActiveTab("completed");
   showSkeleton();
 
-  const res = await fetch(API + "/tasks/my?status=completed", {
+  const res = await fetch(API + "/tasks/my", {
     headers: { Authorization: "Bearer " + token }
   });
+
   const data = await res.json();
 
-  if (!data.tasks || data.tasks.length === 0) {
+  // فلترة المهام المكتملة في الفرونت
+  const completedTasks = (data.tasks || []).filter(
+    task => task.status === "completed"
+  );
+
+  if (!completedTasks.length) {
     showEmpty("لا توجد مهام مكتملة");
     return;
   }
 
   document.getElementById("tasksContainer").innerHTML =
-    data.tasks.map(completedCard).join("");
+    completedTasks.map(completedCard).join("");
 }
-
 /* ================= TASK FLOW ================= */
 async function startTask(task) {
   currentTask = task;

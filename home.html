@@ -62,13 +62,19 @@
 
 <!-- ================= Sidebar ================= -->
 <aside id="sidebar"
-  class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition z-50">
-  <div class="p-4 border-b font-bold">القائمة</div>
-  <nav class="p-4 flex flex-col gap-3">
-    <button class="p-3 bg-emerald-100 rounded">🏠 الرئيسية</button>
-    <button href="tasks.html" class="p-3 hover:bg-gray-100 rounded">📋 المهام</button>
-    <button class="p-3 hover:bg-gray-100 rounded">💰 السحب</button>
-    <button class="p-3 hover:bg-gray-100 rounded">🧾 السجل</button>
+  class="fixed top-16 right-0 w-64 h-[calc(100%-4rem)] bg-white shadow-lg
+         transform translate-x-full transition z-50">
+
+  <div class="p-4 border-b flex justify-between items-center font-bold">
+    <span>القائمة</span>
+    <button onclick="closeSidebar()" class="text-xl">✕</button>
+  </div>
+
+  <nav class="p-4 flex flex-col gap-3 text-sm">
+    <a href="home.html" class="p-3 bg-emerald-100 rounded-xl">🏠 الرئيسية</a>
+    <a href="tasks.html" class="p-3 hover:bg-gray-100 rounded-xl">📋 المهام</a>
+    <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">💰 السحب</a>
+    <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">🧾 السجل</a>
   </nav>
 </aside>
 

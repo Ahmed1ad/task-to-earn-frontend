@@ -330,6 +330,14 @@ document.addEventListener("click", () => {
   profileMenu.classList.add("hidden");
 });
 
+
+// Logout
+function logout() {
+  localStorage.removeItem("token");
+  location.href = "login.html";
+}
+
+
 /* ================= INIT ================= */
 document.getElementById("tabAvailable").onclick = loadAvailableTasks;
 document.getElementById("tabCompleted").onclick = loadCompletedTasks;

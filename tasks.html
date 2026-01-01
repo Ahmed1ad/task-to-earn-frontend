@@ -190,13 +190,19 @@ async function startTask(task) {
     headers: { Authorization: "Bearer " + token }
   });
 
+  localStorage.setItem("activeTask", JSON.stringify({
+  taskId: task.id,
+  startTime: Date.now(),
+  duration: task.duration_seconds
+}));
+
   secondsLeft = task.duration_seconds;
   document.getElementById("timer").innerText = secondsLeft;
   document.getElementById("completeBtn").disabled = true;
   document.getElementById("completeBtn").className =
     "w-full py-3 rounded-xl bg-gray-300 text-white font-bold";
 
-  document.getElementById("adFrame").src = task.ad_url;
+  window.open(task.ad_url, "_blank");
   document.getElementById("taskModal").classList.remove("hidden");
   document.getElementById("taskModal").classList.add("flex");
 
@@ -218,6 +224,8 @@ async function completeTask() {
     method: "POST",
     headers: { Authorization: "Bearer " + token }
   });
+
+  localStorage.removeItem("activeTask");
 
   closeModal();
   loadAvailableTasks();
@@ -336,6 +344,23 @@ document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 
 loadUser();
 loadAvailableTasks();
+
+
+  const activeTask = localStorage.getItem("activeTask");
+
+if (activeTask) {
+  const task = JSON.parse(activeTask);
+  const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
+
+  if (elapsed < task.duration) {
+    // المهمة فشلت
+    localStorage.removeItem("activeTask");
+    alert("❌ المهمة فشلت، أعد المحاولة");
+  } else {
+    // خلص وقتها بس المستخدم مكملش
+    localStorage.removeItem("activeTask");
+  }
+}
 </script>
 
 </body>

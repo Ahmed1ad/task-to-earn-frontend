@@ -1,13 +1,16 @@
-// ================= GLOBAL API =================
+// ================= GLOBAL =================
 window.API = "https://task-to-earn.onrender.com";
 window.token = localStorage.getItem("token");
+const page = location.pathname;
 
-// الصفحات اللي محتاجة تسجيل دخول
+// الصفحات المحمية
 const protectedPages = ["home", "tasks", "withdraw", "profile"];
 
 if (protectedPages.some(p => page.includes(p)) && !token) {
   location.replace("login.html");
 }
+
+
 
 
 // عناصر الصفحة
@@ -99,28 +102,43 @@ async function submit() {
 
 
 
+
+// ================= LOGOUT =================
+window.logout = function () {
+  localStorage.removeItem("token");
+  location.replace("login.html");
+};
+
 // ================= AUTH CHECK =================
 window.authCheck = async function () {
-  const res = await fetch(API + "/auth/check", {
-    headers: {
-      Authorization: "Bearer " + token
+  if (!token) {
+    logout();
+    return null;
+  }
+
+  try {
+    const res = await fetch(API + "/auth/check", {
+      headers: { Authorization: "Bearer " + token }
+    });
+
+    const data = await res.json();
+
+    if (data.status === "banned") {
+      alert("تم حظر حسابك");
+      logout();
+      return null;
     }
-  });
 
-  const data = await res.json();
+    if (data.status !== "success") {
+      logout();
+      return null;
+    }
 
-  if (data.status === "banned") {
-    alert("تم حظر حسابك");
+    return data.user;
+  } catch (e) {
     logout();
     return null;
   }
-
-  if (data.status !== "success") {
-    logout();
-    return null;
-  }
-
-  return data.user;
 };
 
 // ================= TASKS API =================

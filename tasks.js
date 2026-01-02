@@ -3,24 +3,26 @@
   const user = await authCheck();
   if (!user) return;
 
-  document.getElementById("userPoints").innerText = user.points;
+  // عرض النقاط
+  const pointsEl = document.getElementById("userPoints");
+  if (pointsEl) {
+    pointsEl.innerText = user.points;
+  }
 
+  // ربط التابات
   document.getElementById("tabAvailable").onclick = loadAvailableTasks;
   document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 
+  // تحميل المهام المتاحة افتراضيًا
   loadAvailableTasks();
 })();
 
-// ================= LOAD AVAILABLE =================
+// ================= AVAILABLE TASKS =================
 async function loadAvailableTasks() {
   setActiveTab("available");
   showSkeleton();
 
-  const res = await fetch(API + "/tasks/ads", {
-    headers: { Authorization: "Bearer " + token }
-  });
-
-  const data = await res.json();
+  const data = await getAvailableTasks();
 
   if (!data.tasks || data.tasks.length === 0) {
     showEmpty("لا توجد مهام متاحة حاليًا");
@@ -31,24 +33,25 @@ async function loadAvailableTasks() {
     data.tasks.map(taskCard).join("");
 }
 
-// ================= LOAD COMPLETED =================
+// ================= COMPLETED TASKS =================
 async function loadCompletedTasks() {
   setActiveTab("completed");
   showSkeleton();
 
-  const res = await fetch(API + "/tasks/my", {
-    headers: { Authorization: "Bearer " + token }
-  });
+  const data = await getMyTasks();
 
-  const data = await res.json();
+  if (!data.tasks) {
+    showEmpty("لا توجد مهام مكتملة");
+    return;
+  }
 
-  const completed = (data.tasks || []).filter(t =>
+  const completed = data.tasks.filter(t =>
     t.status === "completed" ||
     t.is_completed === true ||
     t.completed_at
   );
 
-  if (!completed.length) {
+  if (completed.length === 0) {
     showEmpty("لا توجد مهام مكتملة");
     return;
   }

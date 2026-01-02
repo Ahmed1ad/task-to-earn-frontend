@@ -1,10 +1,6 @@
-/* =====================================
-   TaskToEarn - Auth main.js (Clean)
-===================================== */
-
-const API = "https://task-to-earn.onrender.com";
-const token = localStorage.getItem("token");
-const page = location.pathname;
+// ================= GLOBAL API =================
+window.API = "https://task-to-earn.onrender.com";
+window.token = localStorage.getItem("token");
 
 // الصفحات اللي محتاجة تسجيل دخول
 const protectedPages = ["home", "tasks", "withdraw", "profile"];
@@ -100,3 +96,44 @@ async function submit() {
     msg.innerText = "خطأ في الاتصال بالسيرفر";
   }
 }
+
+
+
+// ================= AUTH CHECK =================
+window.authCheck = async function () {
+  const res = await fetch(API + "/auth/check", {
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  });
+
+  const data = await res.json();
+
+  if (data.status === "banned") {
+    alert("تم حظر حسابك");
+    logout();
+    return null;
+  }
+
+  if (data.status !== "success") {
+    logout();
+    return null;
+  }
+
+  return data.user;
+};
+
+// ================= TASKS API =================
+window.getAvailableTasks = async function () {
+  const res = await fetch(API + "/tasks/ads", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  return res.json();
+};
+
+window.getMyTasks = async function () {
+  const res = await fetch(API + "/tasks/my", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  return res.json();
+};

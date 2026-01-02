@@ -3,7 +3,7 @@
 
   const user = await authCheck();
   if (!user) return;
-
+       <span id="userPoints" class="font-bold">0</span>
   document.getElementById("tabAvailable").onclick = loadAvailableTasks;
   document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 

@@ -5,7 +5,7 @@
   if (!user) return;
 
   document.getElementById("userPoints").innerText =
-    user.points + " 🪙";
+    user.points + "";
 
   document.getElementById("tabAvailable").onclick = loadAvailableTasks;
   document.getElementById("tabCompleted").onclick = loadCompletedTasks;

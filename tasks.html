@@ -133,13 +133,10 @@ let secondsLeft = 0;
 
 /* ================= LOAD USER ================= */
 async function loadUser() {
-  const res = await fetch(API + "/auth/check", {
-    headers: { Authorization: "Bearer " + token }
-  });
-  const data = await res.json();
-  if (data.status === "success") {
-    document.getElementById("userPoints").innerText = data.user.points;
-  }
+  const user = await authCheck();
+  if (!user) return;
+
+  document.getElementById("userPoints").innerText = user.points;
 }
 
 /* ================= LOAD TASKS ================= */
@@ -147,11 +144,7 @@ async function loadAvailableTasks() {
   setActiveTab("available");
   showSkeleton();
 
-  const res = await fetch(API + "/tasks/ads", {
-    headers: { Authorization: "Bearer " + token }
-  });
-
-  const data = await res.json();
+  const data = await getAvailableTasks();
 
   if (!data.tasks || data.tasks.length === 0) {
     showEmpty("لا توجد مهام متاحة حاليًا");
@@ -166,23 +159,19 @@ async function loadCompletedTasks() {
   setActiveTab("completed");
   showSkeleton();
 
-  const res = await fetch(API + "/tasks/my", {
-    headers: { Authorization: "Bearer " + token }
-  });
+  const data = await getMyTasks();
 
-  const data = await res.json();
-
-  const completedTasks = (data.tasks || []).filter(
+  const completed = (data.tasks || []).filter(
     t => t.status === "completed"
   );
 
-  if (!completedTasks.length) {
+  if (!completed.length) {
     showEmpty("لا توجد مهام مكتملة");
     return;
   }
 
   document.getElementById("tasksContainer").innerHTML =
-    completedTasks.map(completedCard).join("");
+    completed.map(completedCard).join("");
 }
 /* ================= TASK FLOW ================= */
 async function startTask(task) {
@@ -384,9 +373,8 @@ document.getElementById("tabAvailable").addEventListener("click", () => {
   loadAvailableTasks();
 });
 
-document.getElementById("tabCompleted").addEventListener("click", () => {
-  loadCompletedTasks();
-});
+document.getElementById("tabAvailable").onclick = loadAvailableTasks;
+document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 
 loadUser();
 loadAvailableTasks();

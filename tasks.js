@@ -1,14 +1,14 @@
 // ================= INIT =================
-(async function initTasksPage() {
-
+(async function initTasks() {
   const user = await authCheck();
   if (!user) return;
-       <span id="userPoints" class="font-bold">0</span>
+
+  document.getElementById("userPoints").innerText = user.points;
+
   document.getElementById("tabAvailable").onclick = loadAvailableTasks;
   document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 
-  await loadAvailableTasks();
-
+  loadAvailableTasks();
 })();
 
 // ================= LOAD AVAILABLE =================

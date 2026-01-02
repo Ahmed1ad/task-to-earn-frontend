@@ -4,9 +4,6 @@
   const user = await authCheck();
   if (!user) return;
 
-  document.getElementById("userPoints").innerText =
-    user.points + "";
-
   document.getElementById("tabAvailable").onclick = loadAvailableTasks;
   document.getElementById("tabCompleted").onclick = loadCompletedTasks;
 

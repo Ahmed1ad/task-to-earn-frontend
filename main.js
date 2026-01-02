@@ -1,15 +1,39 @@
 // ================= GLOBAL =================
 window.API = "https://task-to-earn.onrender.com";
 window.token = localStorage.getItem("token");
+
 const page = location.pathname;
 
-// الصفحات المحمية
-const protectedPages = ["home", "tasks", "withdraw", "profile"];
+// الصفحات المحمية فقط
+const protectedPages = ["home.html", "tasks.html"];
 
 if (protectedPages.some(p => page.includes(p)) && !token) {
   location.replace("login.html");
 }
 
+// ================= LOGOUT =================
+window.logout = function () {
+  localStorage.removeItem("token");
+  location.replace("login.html");
+};
+
+// ================= AUTH CHECK =================
+window.authCheck = async function () {
+  if (!token) return null;
+
+  const res = await fetch(API + "/auth/check", {
+    headers: { Authorization: "Bearer " + token }
+  });
+
+  const data = await res.json();
+
+  if (data.status !== "success") {
+    logout();
+    return null;
+  }
+
+  return data.user;
+};
 
 
 

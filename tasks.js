@@ -96,8 +96,11 @@ function availableTaskCard(t) {
     </div>
 
     <div class="flex items-start gap-4 mb-4">
-      <div class="w-12 h-12 rounded-full bg-emerald-50 text-2xl flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition">
-        📺
+      <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m-9 0V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-5.25c0-.621-.504-1.125-1.125-1.125H4.125C3.504 11.625 3 12.129 3 12.75V18z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a3 3 0 00-3 3v4.5c0 .621.504 1.125 1.125 1.125h3.75c.621 0 1.125-.504 1.125-1.125V6a3 3 0 00-3-3z" />
+        </svg>
       </div>
       <div>
          <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1">${t.title}</h3>
@@ -132,7 +135,12 @@ function completedTaskCard(t) {
   <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col opacity-75 hover:opacity-100 transition">
     <div class="flex justify-between items-start mb-2">
       <h3 class="font-bold text-gray-700">${t.title}</h3>
-      <div class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">✔ مكتملة</div>
+      <div class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3">
+          <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+        </svg>
+        مكتملة
+      </div>
     </div>
     <div class="text-emerald-600 font-bold text-lg mt-auto">
       +${t.reward_points} نقطة
@@ -214,116 +222,26 @@ function enableCompleteBtn() {
   if (!btn) return;
 
   btn.disabled = false;
-  btn.innerText = "تحقق وحصل النقاط 💰";
-  btn.className = "w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold shadow-lg shadow-green-500/30 hover:scale-[1.02] transition";
-}
-
-async function completeTask() {
-  if (!currentTask) return;
-
-  const btn = document.getElementById("completeBtn");
-  btn.innerText = "جاري التحقق...";
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(API + `/tasks/ads/complete/${currentTask.id}`, {
-      method: "POST",
-      headers: { Authorization: "Bearer " + token }
-    });
-    const data = await res.json();
-
-    if (data.status === "success") {
-      // Success!
-      const user = await authCheck();
-      if (user) updateUserPoints(user.points); // Update points in UI
-
-      localStorage.removeItem("activeTask");
-      closeModal();
-      loadAvailableTasks(); // Reload
-
-      // Show success toast (simple alert for now or implement toast)
-      alert(`مبروك! حصلت على ${data.reward_points} نقطة 🎉`);
-
-    } else {
-      alert("خطأ: " + (data.message || "فشلت العميلة"));
-      closeModal();
-    }
-
-  } catch (e) {
-    alert("خطأ في الاتصال");
-    closeModal();
-  }
-}
-
-async function failTask() {
-  if (currentTask) {
-    try {
-      await fetch(`${API}/tasks/ads/fail/${currentTask.id}`, {
-        method: "POST",
-        headers: { Authorization: "Bearer " + token }
-      });
-    } catch (e) { }
-  }
-  closeModal();
-}
-
-function closeModal() {
-  clearInterval(timerInterval);
-  const modal = document.getElementById("taskModal");
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  }
-  localStorage.removeItem("activeTask");
-  currentTask = null;
-}
-
-
-/* ================= RECOVERY ================= */
-async function checkActiveTask() {
-  const saved = localStorage.getItem("activeTask");
-  if (!saved) return;
-
-  const task = JSON.parse(saved);
-  const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
-
-  // If task expired too long ago, fail it
-  if (elapsed > (task.duration + 60)) {
-    localStorage.removeItem("activeTask");
-  }
-  // Else we could theoretically restore the modal, but usually better to let user restart
-}
-
-
-/* ================= UI HELPERS ================= */
-function setActiveTab(tab) {
-  const avail = document.getElementById("tabAvailable");
-  const comp = document.getElementById("tabCompleted");
-
-  const activeClass = "flex-1 py-3 rounded-xl bg-gray-900 text-white font-bold shadow-lg transition-all";
-  const inactiveClass = "flex-1 py-3 rounded-xl bg-white text-gray-500 font-medium hover:bg-gray-50 transition-all";
-
-  if (tab === "available") {
-    avail.className = activeClass;
-    comp.className = inactiveClass;
-  } else {
-    avail.className = inactiveClass;
-    comp.className = activeClass;
-  }
-}
-
-function showSkeleton() {
-  document.getElementById("tasksContainer").innerHTML = `
-    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
-    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
-    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
+  btn.innerText = "";
+  btn.innerHTML = `
+    <span>تحقق وحصل النقاط</span>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
   `;
+  btn.className = "w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold shadow-lg shadow-green-500/30 hover:scale-[1.02] transition flex items-center justify-center gap-2";
 }
+
+// ... existing code ...
 
 function showEmpty(text) {
   document.getElementById("tasksContainer").innerHTML = `
     <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
-      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-4xl mb-4">💤</div>
+      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
+        </svg>
+      </div>
       <div class="text-gray-800 text-lg font-bold">${text}</div>
     </div>
   `;

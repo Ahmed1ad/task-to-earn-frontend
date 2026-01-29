@@ -79,64 +79,65 @@ async function loadCompletedTasks() {
 
 
 /* ================= RENDERING ================= */
+/* ================= RENDERING ================= */
 function renderTasks(tasks, type) {
   const container = document.getElementById("tasksContainer");
-  container.innerHTML = tasks.map(t => {
-    if (type === "available") return availableTaskCard(t);
-    return completedTaskCard(t);
+  container.innerHTML = tasks.map((t, i) => {
+    if (type === "available") return availableTaskCard(t, i);
+    return completedTaskCard(t, i);
   }).join("");
 }
 
-function availableTaskCard(t) {
+function availableTaskCard(t, i) {
   return `
-  <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition border border-gray-100 flex flex-col group relative overflow-hidden">
+  <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col group relative overflow-hidden animate-slide-up opacity-0" style="animation-delay: ${i * 100}ms">
     <!-- Icon/Badge -->
-    <div class="absolute top-0 right-0 bg-emerald-100 text-emerald-600 px-3 py-1 rounded-bl-xl text-xs font-bold">
+    <div class="absolute top-0 right-0 bg-emerald-100/50 text-emerald-600 px-3 py-1 rounded-bl-xl text-xs font-bold backdrop-blur-sm">
       مهمة جديدة
     </div>
 
     <div class="flex items-start gap-4 mb-4">
-      <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 transition">
+      <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 shadow-sm layer-shadow">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m-9 0V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-5.25c0-.621-.504-1.125-1.125-1.125H4.125C3.504 11.625 3 12.129 3 12.75V18z" />
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a3 3 0 00-3 3v4.5c0 .621.504 1.125 1.125 1.125h3.75c.621 0 1.125-.504 1.125-1.125V6a3 3 0 00-3-3z" />
         </svg>
       </div>
       <div>
-         <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1">${t.title}</h3>
+         <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1 group-hover:text-emerald-600 transition-colors">${t.title}</h3>
          <p class="text-sm text-gray-400 line-clamp-2">${t.description}</p>
       </div>
     </div>
     
-    <div class="mt-auto flex items-center justify-between">
+    <div class="mt-auto flex items-center justify-between p-3 bg-gray-50 rounded-xl">
       <div class="flex flex-col">
-        <span class="text-xs text-gray-400">المكافأة</span>
-        <span class="text-emerald-600 font-extrabold text-xl">+${t.reward_points}</span>
+        <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">المكافأة</span>
+        <span class="text-emerald-600 font-black text-xl">+${t.reward_points}</span>
       </div>
       
       <div class="flex flex-col items-end">
-        <span class="text-xs text-gray-400">الوقت</span>
-        <span class="font-bold text-gray-700">${t.duration_seconds} ث</span>
+        <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">الوقت</span>
+        <span class="font-bold text-gray-700 font-mono">${t.duration_seconds}s</span>
       </div>
     </div>
 
     <button onclick='startTask(${JSON.stringify(t)})'
-      class="mt-4 w-full py-3 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 hover:shadow-emerald-500/30 active:scale-95 transition flex items-center justify-center gap-2">
+      class="mt-4 w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 hover:shadow-emerald-500/30 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-xl">
       <span>ابدأ الآن</span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:-scale-x-100 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
       </svg>
     </button>
   </div>`;
 }
 
-function completedTaskCard(t) {
+function completedTaskCard(t, i) {
   return `
-  <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col opacity-75 hover:opacity-100 transition">
+  <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col opacity-0 hover:opacity-100 transition duration-500 animate-slide-up" style="animation-delay: ${i * 100}ms">
     <div class="flex justify-between items-start mb-2">
       <h3 class="font-bold text-gray-700">${t.title}</h3>
-      <div class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3">
+      <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
           <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
         </svg>
         مكتملة
@@ -145,7 +146,10 @@ function completedTaskCard(t) {
     <div class="text-emerald-600 font-bold text-lg mt-auto">
       +${t.reward_points} نقطة
     </div>
-    <div class="text-xs text-gray-400 mt-1">
+    <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
       ${t.completed_at ? new Date(t.completed_at).toLocaleDateString("ar-EG") : ""}
     </div>
   </div>`;

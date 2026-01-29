@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>TaskToEarn | الملف الشخصي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.3s ease-out forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- ================= Header ================= -->
+    <header class="fixed top-0 w-full glass shadow-sm z-50 border-b border-gray-100">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+                <button id="menuBtn" class="text-2xl p-1 rounded hover:bg-gray-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-8 h-8">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+                <span class="font-bold text-lg hidden sm:block">الملف الشخصي</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <!-- Points Badge -->
+                <div
+                    class="flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-amber-50 border border-amber-100 px-4 py-1.5 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-6 h-6 text-amber-500">
+                        <path
+                            d="M10.464 8.746c.227-.18.497-.311.786-.394v2.795a2.252 2.252 0 01-.786-.393c-.394-.313-.546-.681-.546-1.004 0-.314.151-.68.546-1.004zM12.75 15.662v-2.824c.347.085.664.228.921.421.427.32.579.686.579.991 0 .305-.152.671-.579.991a2.534 2.534 0 01-.921.42z" />
+                        <path fill-rule="evenodd"
+                            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v.816a3.836 3.836 0 00-1.72.656c-.89.658-1.29 1.57-1.29 2.59 0 2.613 2.665 3.616 5.068 4.436.96.328 1.157.925 1.157 1.606 0 .53-.254 1.258-1.554 1.258-1.156 0-1.616-.677-1.896-1.066a.75.75 0 00-1.248.868c.51 1.056 1.487 1.637 2.644 1.696v.842a.75.75 0 001.5 0v-.806a3.836 3.836 0 001.72-.656c.89-.658 1.29-1.57 1.29-2.59 0-2.613-2.665-3.616-5.068-4.436-.96-.328-1.157-.925-1.157-1.606 0-.53.254-1.258 1.554-1.258 1.156 0 1.616.677 1.896 1.066a.75.75 0 001.248-.868c-.51-1.056-1.487-1.637-2.644-1.696V6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span id="userPoints" class="font-black text-amber-600">0</span>
+                </div>
+
+                <!-- Profile -->
+                <div class="relative">
+                    <button id="profileBtn"
+                        class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 text-white flex items-center justify-center hover:shadow-lg transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd"
+                                d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </button>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profileMenu"
+                        class="hidden absolute left-0 mt-2 w-40 bg-white rounded-xl shadow-lg p-2 border border-gray-100">
+                        <button onclick="window.location.href='profile.html'"
+                            class="w-full text-right px-3 py-2 bg-emerald-100 text-emerald-800 font-bold rounded-lg transition">
+                            حسابي
+                        </button>
+                        <button onclick="window.location.href='withdraw.html'"
+                            class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded-lg transition">
+                            السحب
+                        </button>
+                        <button onclick="logout()"
+                            class="w-full text-right px-3 py-2 hover:bg-red-100 text-red-600 rounded-lg transition">
+                            تسجيل خروج
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================= Sidebar ================= -->
+    <aside id="sidebar" class="fixed top-16 right-0 w-64 h-[calc(100%-4rem)] bg-white shadow-lg
+         transform translate-x-full transition z-50">
+
+        <div class="p-4 border-b flex justify-between items-center font-bold">
+            <span>القائمة</span>
+            <button onclick="closeSidebar()" class="p-1 rounded-full hover:bg-gray-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <nav class="p-4 flex flex-col gap-3 text-sm">
+            <a href="home.html" class="p-3 hover:bg-gray-100 rounded-xl flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                الرئيسية
+            </a>
+            <a href="tasks.html" class="p-3 hover:bg-gray-100 rounded-xl flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                </svg>
+                المهام
+            </a>
+            <a href="profile.html"
+                class="p-3 bg-emerald-100 rounded-xl flex items-center gap-3 font-bold text-emerald-800">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                الملف الشخصي
+            </a>
+            <a href="withdraw.html" class="p-3 hover:bg-gray-100 rounded-xl flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                السحب
+            </a>
+            <a href="#" class="p-3 hover:bg-gray-100 rounded-xl flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                السجل
+            </a>
+        </nav>
+    </aside>
+
+    <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+
+    <!-- ================= Main ================= -->
+    <main class="pt-24 max-w-4xl mx-auto px-4 space-y-8 pb-10">
+
+        <!-- Welcome -->
+        <div class="bg-gray-900 text-white rounded-2xl p-6 shadow-xl animate-slide-up">
+            <div class="flex items-center gap-3 mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                    <path fill-rule="evenodd"
+                        d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
+                        clip-rule="evenodd" />
+                </svg>
+                <h2 class="text-2xl font-bold">
+                    مرحبًا <span id="username">...</span>
+                </h2>
+            </div>
+            <p class="text-gray-300">إدارة حسابك ومعلوماتك الشخصية</p>
+        </div>
+
+        <!-- Profile Information -->
+        <section class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 animate-slide-up delay-100">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    class="w-6 h-6 text-emerald-600">
+                    <path fill-rule="evenodd"
+                        d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
+                        clip-rule="evenodd" />
+                </svg>
+                المعلومات الشخصية
+            </h3>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path fill-rule="evenodd"
+                                    d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">اسم المستخدم</p>
+                            <p id="profileUsername" class="font-bold text-gray-800">...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path
+                                    d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+                                <path
+                                    d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">البريد الإلكتروني</p>
+                            <p id="profileEmail" class="font-bold text-gray-800">...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path
+                                    d="M12.75 12.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM7.5 15.75a.75.75 0 100-1.5.75.75 0 000 1.5zM8.25 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM9.75 15.75a.75.75 0 100-1.5.75.75 0 000 1.5zM10.5 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM12 15.75a.75.75 0 100-1.5.75.75 0 000 1.5zM12.75 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM14.25 15.75a.75.75 0 100-1.5.75.75 0 000 1.5zM15 17.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM16.5 15.75a.75.75 0 100-1.5.75.75 0 000 1.5zM15 12.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM16.5 13.5a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+                                <path fill-rule="evenodd"
+                                    d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3A.75.75 0 0118 3v1.5h.75a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3H6V3a.75.75 0 01.75-.75zm13.5 9a1.5 1.5 0 00-1.5-1.5H5.25a1.5 1.5 0 00-1.5 1.5v7.5a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5v-7.5z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">تاريخ الانضمام</p>
+                            <p id="joinDate" class="font-bold text-gray-800">...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Grid -->
+        <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 animate-slide-up delay-200">
+            <div class="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path
+                                d="M10.464 8.746c.227-.18.497-.311.786-.394v2.795a2.252 2.252 0 01-.786-.393c-.394-.313-.546-.681-.546-1.004 0-.314.151-.68.546-1.004zM12.75 15.662v-2.824c.347.085.664.228.921.421.427.32.579.686.579.991 0 .305-.152.671-.579.991a2.534 2.534 0 01-.921.42z" />
+                            <path fill-rule="evenodd"
+                                d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v.816a3.836 3.836 0 00-1.72.656c-.89.658-1.29 1.57-1.29 2.59 0 2.613 2.665 3.616 5.068 4.436.96.328 1.157.925 1.157 1.606 0 .53-.254 1.258-1.554 1.258-1.156 0-1.616-.677-1.896-1.066a.75.75 0 00-1.248.868c.51 1.056 1.487 1.637 2.644 1.696v.842a.75.75 0 001.5 0v-.806a3.836 3.836 0 001.72-.656c.89-.658 1.29-1.57 1.29-2.59 0-2.613-2.665-3.616-5.068-4.436-.96-.328-1.157-.925-1.157-1.606 0-.53.254-1.258 1.554-1.258 1.156 0 1.616.677 1.896 1.066a.75.75 0 001.248-.868c-.51-1.056-1.487-1.637-2.644-1.696V6z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">إجمالي النقاط</p>
+                <h4 id="totalPoints" class="text-2xl font-black text-gray-800">0</h4>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd"
+                                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">المهام المكتملة</p>
+                <h4 id="completedTasks" class="text-2xl font-black text-gray-800">0</h4>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
+                            <path fill-rule="evenodd"
+                                d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 14.625v-9.75zM8.25 9.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM18.75 9a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V9.75a.75.75 0 00-.75-.75h-.008zM4.5 9.75A.75.75 0 015.25 9h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V9.75z"
+                                clip-rule="evenodd" />
+                            <path
+                                d="M2.25 18a.75.75 0 000 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 00-.75-.75H2.25z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">السحوبات</p>
+                <h4 id="pendingWithdrawals" class="text-2xl font-black text-gray-800">0</h4>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 shadow-lg border border-gray-100 hover:shadow-xl transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd"
+                                d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-1">المستوى</p>
+                <h4 id="userLevel" class="text-2xl font-black text-gray-800">مبتدئ</h4>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 animate-slide-up delay-300">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    class="w-6 h-6 text-emerald-600">
+                    <path fill-rule="evenodd"
+                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z"
+                        clip-rule="evenodd" />
+                </svg>
+                النشاط الأخير
+            </h3>
+
+            <div id="recentActivity" class="space-y-3">
+                <!-- Activity items will be injected here -->
+            </div>
+
+            <div id="noActivity" class="hidden text-center py-10">
+                <div
+                    class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4 mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-10 h-10">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <p class="text-gray-800 font-bold text-lg">لا توجد أنشطة بعد</p>
+                <p class="text-gray-500 text-sm mt-1">ابدأ بإكمال بعض المهام</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= Script ================= -->
+    <script src="main.js"></script>
+    <script>
+        // Sidebar
+        const menuBtn = document.getElementById("menuBtn");
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+
+        menuBtn.onclick = () => {
+            sidebar.classList.remove("translate-x-full");
+            overlay.classList.remove("hidden");
+        };
+
+        function closeSidebar() {
+            sidebar.classList.add("translate-x-full");
+            overlay.classList.add("hidden");
+        }
+
+        overlay.onclick = closeSidebar;
+
+        // Profile dropdown
+        const profileBtn = document.getElementById("profileBtn");
+        const profileMenu = document.getElementById("profileMenu");
+
+        profileBtn.onclick = () => {
+            profileMenu.classList.toggle("hidden");
+        };
+
+        // Load user data
+        async function loadUser() {
+            try {
+                const res = await fetch(`${API}/me`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.status === "success" && data.user) {
+                    const user = data.user;
+
+                    // Update header and profile sections
+                    if (document.getElementById("username"))
+                        document.getElementById("username").innerText = user.username;
+                    if (document.getElementById("userPoints"))
+                        document.getElementById("userPoints").innerText = user.points;
+                    if (document.getElementById("profileUsername"))
+                        document.getElementById("profileUsername").innerText = user.username;
+                    if (document.getElementById("profileEmail"))
+                        document.getElementById("profileEmail").innerText = user.email;
+                    if (document.getElementById("totalPoints"))
+                        document.getElementById("totalPoints").innerText = user.points;
+
+                    // Format join date
+                    if (user.created_at && document.getElementById("joinDate")) {
+                        const date = new Date(user.created_at).toLocaleDateString("ar-EG", {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                        document.getElementById("joinDate").innerText = date;
+                    }
+
+                    // Calculate user level based on points
+                    const levelEl = document.getElementById("userLevel");
+                    if (levelEl) {
+                        if (user.points < 100) levelEl.innerText = "مبتدئ";
+                        else if (user.points < 500) levelEl.innerText = "متوسط";
+                        else if (user.points < 1000) levelEl.innerText = "متقدم";
+                        else levelEl.innerText = "خبير";
+                    }
+                }
+            } catch (err) {
+                console.error("Error loading user:", err);
+            }
+        }
+
+        // Load completed tasks count
+        async function loadTasksStats() {
+            try {
+                const res = await fetch(`${API}/tasks/my`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.status === "success" && data.tasks) {
+                    const completedCount = data.tasks.length;
+                    if (document.getElementById("completedTasks"))
+                        document.getElementById("completedTasks").innerText = completedCount;
+
+                    // Load recent activity
+                    loadRecentActivity(data.tasks);
+                }
+            } catch (err) {
+                console.error("Error loading tasks stats:", err);
+            }
+        }
+
+        // Load withdrawals count
+        async function loadWithdrawalsStats() {
+            try {
+                const res = await fetch(`${API}/withdraw/my`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.status === "success" && data.withdrawals) {
+                    const pendingCount = data.withdrawals.filter(w => w.status === 'pending').length;
+                    if (document.getElementById("pendingWithdrawals"))
+                        document.getElementById("pendingWithdrawals").innerText = pendingCount;
+                }
+            } catch (err) {
+                console.error("Error loading withdrawals stats:", err);
+            }
+        }
+
+        // Load recent activity
+        function loadRecentActivity(tasks) {
+            const activityContainer = document.getElementById("recentActivity");
+            const noActivity = document.getElementById("noActivity");
+
+            if (!tasks || tasks.length === 0) {
+                activityContainer.innerHTML = "";
+                noActivity.classList.remove("hidden");
+                return;
+            }
+
+            noActivity.classList.add("hidden");
+
+            // Show last 5 tasks
+            const recentTasks = tasks.slice(-5).reverse();
+
+            activityContainer.innerHTML = recentTasks.map(task => {
+                const date = new Date(task.completed_at).toLocaleDateString("ar-EG", {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                return `
+          <div class="border border-gray-200 rounded-xl p-4 hover:shadow-md transition flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <p class="font-bold text-gray-800">أكملت مهمة</p>
+                <p class="text-xs text-gray-500">${date}</p>
+              </div>
+            </div>
+            <div class="text-left">
+              <p class="text-emerald-600 font-black text-lg">+${task.reward_points}</p>
+              <p class="text-xs text-gray-400">نقطة</p>
+            </div>
+          </div>
+        `;
+            }).join("");
+        }
+
+        // Initialize
+        if (token) {
+            loadUser();
+            loadTasksStats();
+            loadWithdrawalsStats();
+        }
+    </script>
+
+</body>
+
+</html>

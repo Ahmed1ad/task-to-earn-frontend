@@ -26,15 +26,12 @@
 <body class="bg-gray-50 min-h-screen">
 
   <!-- ================= TOP NAV ================= -->
-  <header class="fixed top-0 w-full glass shadow-sm z-40 border-b border-gray-100">
+  <header class="fixed top-0 w-full glass shadow-sm z-50 border-b border-gray-100">
     <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
 
       <div class="flex items-center gap-3">
-        <a href="home.html"
-          class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition">
-          🏠
-        </a>
-        <h1 class="font-bold text-lg hidden sm:block">قائمة المهام</h1>
+        <button id="menuBtn" class="text-2xl p-1 rounded hover:bg-gray-100 transition">☰</button>
+        <span class="font-bold text-lg hidden sm:block">قائمة المهام</span>
       </div>
 
       <div class="flex items-center gap-3">
@@ -48,6 +45,25 @@
 
     </div>
   </header>
+
+  <!-- ================= Sidebar ================= -->
+  <aside id="sidebar" class="fixed top-16 right-0 w-64 h-[calc(100%-4rem)] bg-white shadow-lg
+         transform translate-x-full transition z-50">
+
+    <div class="p-4 border-b flex justify-between items-center font-bold">
+      <span>القائمة</span>
+      <button onclick="closeSidebar()" class="text-xl">✕</button>
+    </div>
+
+    <nav class="p-4 flex flex-col gap-3 text-sm">
+      <a href="home.html" class="p-3 hover:bg-gray-100 rounded-xl">🏠 الرئيسية</a>
+      <a href="tasks.html" class="p-3 bg-emerald-100 rounded-xl">📋 المهام</a>
+      <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">💰 السحب</a>
+      <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">🧾 السجل</a>
+    </nav>
+  </aside>
+
+  <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
 
   <!-- ================= CONTENT ================= -->

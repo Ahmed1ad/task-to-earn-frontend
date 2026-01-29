@@ -1,5 +1,7 @@
 // ================= GLOBAL =================
-window.API = "https://task-to-earn.onrender.com";
+window.API = location.hostname === "localhost" || location.hostname === "127.0.0.1"
+  ? "http://localhost:3000"
+  : "https://task-to-earn.onrender.com";
 window.token = localStorage.getItem("token");
 
 const page = location.pathname;
@@ -11,11 +13,11 @@ if (protectedPages.some(p => page.includes(p)) && !token) {
   location.replace("login.html");
 }
 
-// ================= LOGOUT =================
-window.logout = function () {
-  localStorage.removeItem("token");
-  location.replace("login.html");
-};
+
+// لو المستخدم مسجل دخول بالفعل وهو في صفحة اللوجن، نوديه الهوم
+if (page.includes("login.html") && token) {
+  location.replace("home.html");
+}
 
 // ================= AUTH CHECK =================
 window.authCheck = async function () {

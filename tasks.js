@@ -328,3 +328,24 @@ function showEmpty(text) {
     </div>
   `;
 }
+
+/* ================= SIDEBAR ================= */
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+if (menuBtn) {
+  menuBtn.onclick = () => {
+    sidebar.classList.remove("translate-x-full");
+    overlay.classList.remove("hidden");
+  };
+}
+
+function closeSidebar() {
+  if (sidebar) sidebar.classList.add("translate-x-full");
+  if (overlay) overlay.classList.add("hidden");
+}
+
+if (overlay) {
+  overlay.onclick = closeSidebar;
+}

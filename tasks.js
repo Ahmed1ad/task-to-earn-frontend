@@ -4,19 +4,21 @@ let timerInterval = null;
 let secondsLeft = 0;
 
 /* ================= INIT ================= */
+/* ================= INIT ================= */
 (async function initTasks() {
-  const user = await authCheck();
-  if (!user) return;
-
-  // Render User Points
-  updateUserPoints(user.points);
-
-  // Tab Listeners
+  // Tab Listeners - Attach immediately for responsiveness
   const tabAvailable = document.getElementById("tabAvailable");
   const tabCompleted = document.getElementById("tabCompleted");
 
   if (tabAvailable) tabAvailable.onclick = loadAvailableTasks;
   if (tabCompleted) tabCompleted.onclick = loadCompletedTasks;
+
+  // Now perform auth check
+  const user = await authCheck();
+  if (!user) return;
+
+  // Render User Points
+  updateUserPoints(user.points);
 
   // Initial Load
   await loadAvailableTasks();
@@ -46,6 +48,7 @@ async function loadAvailableTasks() {
 
     renderTasks(data.tasks, "available");
   } catch (e) {
+    console.error("Load Available Error:", e);
     showEmpty("حدث خطأ في تحميل المهام");
   }
 }
@@ -73,12 +76,12 @@ async function loadCompletedTasks() {
 
     renderTasks(completed, "completed");
   } catch (e) {
+    console.error("Load History Error:", e);
     showEmpty("حدث خطأ في تحميل السجل");
   }
 }
 
 
-/* ================= RENDERING ================= */
 /* ================= RENDERING ================= */
 function renderTasks(tasks, type) {
   const container = document.getElementById("tasksContainer");
@@ -90,7 +93,7 @@ function renderTasks(tasks, type) {
 
 function availableTaskCard(t, i) {
   return `
-  <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col group relative overflow-hidden animate-slide-up opacity-0" style="animation-delay: ${i * 100}ms">
+  <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col group relative overflow-hidden animate-slide-up" style="animation-delay: ${i * 100}ms">
     <!-- Icon/Badge -->
     <div class="absolute top-0 right-0 bg-emerald-100/50 text-emerald-600 px-3 py-1 rounded-bl-xl text-xs font-bold backdrop-blur-sm">
       مهمة جديدة

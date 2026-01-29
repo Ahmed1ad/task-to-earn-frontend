@@ -136,7 +136,7 @@ function availableTaskCard(t, i) {
 
 function completedTaskCard(t, i) {
   return `
-  <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col opacity-0 hover:opacity-100 transition duration-500 animate-slide-up" style="animation-delay: ${i * 100}ms">
+  <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col hover:opacity-100 transition duration-500 animate-slide-up" style="animation-delay: ${i * 100}ms">
     <div class="flex justify-between items-start mb-2">
       <h3 class="font-bold text-gray-700">${t.title}</h3>
       <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
@@ -239,7 +239,107 @@ function enableCompleteBtn() {
   btn.className = "w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold shadow-lg shadow-green-500/30 hover:scale-[1.02] transition flex items-center justify-center gap-2";
 }
 
-// ... existing code ...
+async function completeTask() {
+  if (!currentTask) return;
+
+  const btn = document.getElementById("completeBtn");
+  btn.innerText = "جاري التحقق...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(API + `/tasks/ads/complete/${currentTask.id}`, {
+      method: "POST",
+      headers: { Authorization: "Bearer " + token }
+    });
+    const data = await res.json();
+
+    if (data.status === "success") {
+      // Success!
+      const user = await authCheck();
+      if (user) updateUserPoints(user.points); // Update points in UI
+
+      localStorage.removeItem("activeTask");
+      closeModal();
+      loadAvailableTasks(); // Reload
+
+      // Show success toast (simple alert for now or implement toast)
+      alert(`مبروك! حصلت على ${data.reward_points} نقطة 🎉`);
+
+    } else {
+      alert("خطأ: " + (data.message || "فشلت العملية"));
+      closeModal();
+    }
+
+  } catch (e) {
+    alert("خطأ في الاتصال");
+    closeModal();
+  }
+}
+
+async function failTask() {
+  if (currentTask) {
+    try {
+      await fetch(`${API}/tasks/ads/fail/${currentTask.id}`, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token }
+      });
+    } catch (e) { }
+  }
+  closeModal();
+}
+
+function closeModal() {
+  clearInterval(timerInterval);
+  const modal = document.getElementById("taskModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+  localStorage.removeItem("activeTask");
+  currentTask = null;
+}
+
+
+/* ================= RECOVERY ================= */
+async function checkActiveTask() {
+  const saved = localStorage.getItem("activeTask");
+  if (!saved) return;
+
+  const task = JSON.parse(saved);
+  const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
+
+  // If task expired too long ago, fail it
+  if (elapsed > (task.duration + 60)) {
+    localStorage.removeItem("activeTask");
+  }
+  // Else we could theoretically restore the modal, but usually better to let user restart
+}
+
+
+/* ================= UI HELPERS ================= */
+function setActiveTab(tab) {
+  const avail = document.getElementById("tabAvailable");
+  const comp = document.getElementById("tabCompleted");
+
+  const activeClass = "flex-1 py-3 rounded-xl bg-gray-900 text-white font-bold shadow-lg transition-all";
+  const inactiveClass = "flex-1 py-3 rounded-xl bg-white text-gray-500 font-medium hover:bg-gray-50 transition-all";
+
+  if (tab === "available") {
+    avail.className = activeClass;
+    comp.className = inactiveClass;
+  } else {
+    avail.className = inactiveClass;
+    comp.className = activeClass;
+  }
+}
+
+function showSkeleton() {
+  document.getElementById("tasksContainer").innerHTML = `
+    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
+    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
+    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
+  `;
+}
 
 function showEmpty(text) {
   document.getElementById("tasksContainer").innerHTML = `

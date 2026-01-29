@@ -20,22 +20,7 @@ if (page.includes("login.html") && token) {
 }
 
 // ================= AUTH CHECK =================
-window.authCheck = async function () {
-  if (!token) return null;
-
-  const res = await fetch(API + "/auth/check", {
-    headers: { Authorization: "Bearer " + token }
-  });
-
-  const data = await res.json();
-
-  if (data.status !== "success") {
-    logout();
-    return null;
-  }
-
-  return data.user;
-};
+// (Auth check definition was here, removed duplicate)
 
 
 

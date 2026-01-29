@@ -6,52 +6,134 @@
   <title>TaskToEarn | الرئيسية</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: "#22c55e"
-          }
-        }
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
       }
     }
-  </script>
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .animate-slide-up {
+      animation: slideUp 0.4s ease-out forwards;
+    }
+
+    .animate-scale-in {
+      animation: scaleIn 0.3s ease-out forwards;
+    }
+
+    .delay-100 {
+      animation-delay: 100ms;
+    }
+
+    .delay-200 {
+      animation-delay: 200ms;
+    }
+  </style>
 </head>
 
 <body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen">
 
   <!-- ================= Header ================= -->
-  <header class="fixed top-0 w-full bg-white shadow z-50">
+  <header class="fixed top-0 w-full glass shadow-sm z-50 border-b border-gray-100">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
-      <!-- Menu -->
-      <button id="menuBtn" class="text-2xl">☰</button>
-
-      <!-- Points -->
-      <div class="flex items-center gap-2 bg-emerald-100 px-3 py-1 rounded-full">
-        🪙 <span id="userPoints" class="font-bold">0</span>
+      <div class="flex items-center gap-3">
+        <button id="menuBtn" class="text-2xl p-1 rounded hover:bg-gray-100 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+        <span class="font-bold text-lg hidden sm:block">الصفحة الرئيسية</span>
       </div>
 
-      <!-- Profile -->
-      <div class="relative">
-        <button id="profileBtn" class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
-          👤
-        </button>
+      <div class="flex items-center gap-3">
+        <!-- Points Badge -->
+        <div
+          class="flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-amber-50 border border-amber-100 px-4 py-1.5 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            class="w-6 h-6 text-amber-500">
+            <path
+              d="M10.464 8.746c.227-.18.497-.311.786-.394v2.795a2.252 2.252 0 01-.786-.393c-.394-.313-.546-.681-.546-1.004 0-.314.151-.68.546-1.004zM12.75 15.662v-2.824c.347.085.664.228.921.421.427.32.579.686.579.991 0 .305-.152.671-.579.991a2.534 2.534 0 01-.921.42z" />
+            <path fill-rule="evenodd"
+              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v.816a3.836 3.836 0 00-1.72.656c-.89.658-1.29 1.57-1.29 2.59 0 2.613 2.665 3.616 5.068 4.436.96.328 1.157.925 1.157 1.606 0 .53-.254 1.258-1.554 1.258-1.156 0-1.616-.677-1.896-1.066a.75.75 0 00-1.248.868c.51 1.056 1.487 1.637 2.644 1.696v.842a.75.75 0 001.5 0v-.806a3.836 3.836 0 001.72-.656c.89-.658 1.29-1.57 1.29-2.59 0-2.613-2.665-3.616-5.068-4.436-.96-.328-1.157-.925-1.157-1.606 0-.53.254-1.258 1.554-1.258 1.156 0 1.616.677 1.896 1.066a.75.75 0 001.248-.868c-.51-1.056-1.487-1.637-2.644-1.696V6z"
+              clip-rule="evenodd" />
+          </svg>
+          <span id="userPoints" class="font-black text-amber-600">0</span>
+        </div>
 
-        <!-- Profile Dropdown -->
-        <div id="profileMenu" class="hidden absolute left-0 mt-2 w-40 bg-white rounded-xl shadow p-2">
-          <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded">
-            حسابي
+        <!-- Profile -->
+        <div class="relative">
+          <button id="profileBtn"
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 text-white flex items-center justify-center hover:shadow-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+              <path fill-rule="evenodd"
+                d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
+                clip-rule="evenodd" />
+            </svg>
           </button>
-          <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded">
-            السحب
-          </button>
-          <button onclick="logout()" class="w-full text-right px-3 py-2 hover:bg-red-100 text-red-600 rounded">
-            تسجيل خروج
-          </button>
+
+          <!-- Profile Dropdown -->
+          <div id="profileMenu"
+            class="hidden absolute left-0 mt-2 w-40 bg-white rounded-xl shadow-lg p-2 border border-gray-100">
+            <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded-lg transition">
+              حسابي
+            </button>
+            <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded-lg transition">
+              السحب
+            </button>
+            <button onclick="logout()"
+              class="w-full text-right px-3 py-2 hover:bg-red-100 text-red-600 rounded-lg transition">
+              تسجيل خروج
+            </button>
+          </div>
         </div>
       </div>
 
@@ -64,14 +146,46 @@
 
     <div class="p-4 border-b flex justify-between items-center font-bold">
       <span>القائمة</span>
-      <button onclick="closeSidebar()" class="text-xl">✕</button>
+      <button onclick="closeSidebar()" class="p-1 rounded-full hover:bg-gray-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
 
     <nav class="p-4 flex flex-col gap-3 text-sm">
-      <a href="home.html" class="p-3 bg-emerald-100 rounded-xl">🏠 الرئيسية</a>
-      <a href="tasks.html" class="p-3 hover:bg-gray-100 rounded-xl">📋 المهام</a>
-      <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">💰 السحب</a>
-      <a href="#" class="p-3 hover:bg-gray-100 rounded-xl">🧾 السجل</a>
+      <a href="home.html" class="p-3 bg-emerald-100 rounded-xl flex items-center gap-3 font-bold text-emerald-800">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+        الرئيسية
+      </a>
+      <a href="tasks.html" class="p-3 hover:bg-gray-100 rounded-xl flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+        </svg>
+        المهام
+      </a>
+      <a href="#" class="p-3 hover:bg-gray-100 rounded-xl flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        السحب
+      </a>
+      <a href="#" class="p-3 hover:bg-gray-100 rounded-xl flex items-center gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        السجل
+      </a>
     </nav>
   </aside>
 
@@ -81,43 +195,90 @@
   <main class="pt-24 max-w-6xl mx-auto px-4 space-y-10">
 
     <!-- Welcome -->
-    <div class="bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-2xl p-6 shadow">
-      <h2 class="text-2xl font-bold mb-1">
-        👋 مرحبًا <span id="username">...</span>
-      </h2>
-      <p>الصفحة الرئيسية لعرض المهام الجديدة فقط</p>
+    <div class="bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-2xl p-6 shadow-xl animate-slide-up">
+      <div class="flex items-center gap-3 mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+          <path
+            d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
+          <path
+            d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
+        </svg>
+        <h2 class="text-2xl font-bold">
+          مرحبًا <span id="username">...</span>
+        </h2>
+      </div>
+      <p class="text-emerald-50">ابدأ المهام الجديدة واربح النقاط!</p>
     </div>
 
     <!-- Tasks Section -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-xl font-bold">📺 المهام الجديدة</h3>
-        <button onclick="window.location.href='tasks.html'" class="text-primary font-semibold">
-          عرض المزيد →
+    <section class="animate-slide-up delay-100">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            class="w-6 h-6 text-emerald-600">
+            <path fill-rule="evenodd"
+              d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a1.875 1.875 0 01-1.875-1.875V5.25A3.75 3.75 0 009 1.5H5.625zM7.5 15a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5A.75.75 0 017.5 15zm.75 2.25a.75.75 0 000 1.5H12a.75.75 0 000-1.5H8.25z"
+              clip-rule="evenodd" />
+            <path
+              d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z" />
+          </svg>
+          <h3 class="text-xl font-bold text-gray-800">المهام الجديدة</h3>
+        </div>
+        <button onclick="window.location.href='tasks.html'"
+          class="text-emerald-600 font-bold hover:text-emerald-700 transition flex items-center gap-1">
+          <span>عرض المزيد</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:-scale-x-100" viewBox="0 0 20 20"
+            fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
         </button>
       </div>
 
       <div id="tasksContainer" class="grid gap-6 sm:grid-cols-2"></div>
 
       <div id="noTasks" class="hidden text-center text-gray-500 py-10">
-        لا توجد مهام متاحة الآن
+        <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4 mx-auto">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-10 h-10">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
+          </svg>
+        </div>
+        <p class="text-gray-800 font-bold text-lg">لا توجد مهام متاحة الآن</p>
       </div>
     </section>
 
-    <!-- Wallet Section (موجودة كما هي ولم تُحذف) -->
-    <section class="bg-white rounded-2xl p-6 shadow flex items-center justify-between">
+    <!-- Wallet Section -->
+    <section
+      class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex items-center justify-between animate-slide-up delay-200">
       <div>
-        <p class="text-gray-500 text-sm">رصيدك الحالي</p>
-        <h4 class="text-2xl font-bold">
+        <p class="text-gray-400 text-sm uppercase tracking-wider font-semibold mb-1">رصيدك الحالي</p>
+        <h4 class="text-3xl font-black text-gray-800 mb-1">
           <span id="walletPoints">0</span> نقطة
         </h4>
-        <p class="text-xs text-gray-400">≈ 0.00 USD</p>
+        <p class="text-xs text-gray-400 flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3">
+            <path
+              d="M10.464 8.746c.227-.18.497-.311.786-.394v2.795a2.252 2.252 0 01-.786-.393c-.394-.313-.546-.681-.546-1.004 0-.314.151-.68.546-1.004zM12.75 15.662v-2.824c.347.085.664.228.921.421.427.32.579.686.579.991 0 .305-.152.671-.579.991a2.534 2.534 0 01-.921.42z" />
+            <path fill-rule="evenodd"
+              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v.816a3.836 3.836 0 00-1.72.656c-.89.658-1.29 1.57-1.29 2.59 0 2.613 2.665 3.616 5.068 4.436.96.328 1.157.925 1.157 1.606 0 .53-.254 1.258-1.554 1.258-1.156 0-1.616-.677-1.896-1.066a.75.75 0 00-1.248.868c.51 1.056 1.487 1.637 2.644 1.696v.842a.75.75 0 001.5 0v-.806a3.836 3.836 0 001.72-.656c.89-.658 1.29-1.57 1.29-2.59 0-2.613-2.665-3.616-5.068-4.436-.96-.328-1.157-.925-1.157-1.606 0-.53.254-1.258 1.554-1.258 1.156 0 1.616.677 1.896 1.066a.75.75 0 001.248-.868c-.51-1.056-1.487-1.637-2.644-1.696V6z"
+              clip-rule="evenodd" />
+          </svg>
+          ≈ 0.00 USD
+        </p>
       </div>
 
-      <!-- زر السحب (لم يتم حذفه) -->
-      <button class="bg-primary text-white px-6 py-3 rounded-xl hover:bg-emerald-600"
+      <button
+        class="bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-300 font-bold flex items-center gap-2"
         onclick="location.href='withdraw.html'">
-        سحب
+        <span>سحب</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+          <path fill-rule="evenodd"
+            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z"
+            clip-rule="evenodd" />
+        </svg>
       </button>
     </section>
 
@@ -212,24 +373,48 @@
 
         noTasks.classList.add("hidden");
 
-        tasksToShow.forEach(task => {
+        tasksToShow.forEach((task, i) => {
           const card = document.createElement("div");
-          card.className = "bg-white rounded-2xl shadow p-5 flex flex-col gap-4";
+          card.className = "bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col group relative overflow-hidden animate-slide-up";
+          card.style.animationDelay = `${i * 100}ms`;
 
           card.innerHTML = `
-        <div class="text-4xl text-center">📺</div>
-        <h4 class="text-lg font-bold text-center">${task.title}</h4>
-        <p class="text-center text-gray-500">${task.description}</p>
-
-        <div class="flex justify-between text-sm">
-          <span>⏱ ${task.duration_seconds} ثواني</span>
-          <span>🎁 ${task.reward_points} نقاط</span>
+        <!-- Badge -->
+        <div class="absolute top-0 right-0 bg-emerald-100/50 text-emerald-600 px-3 py-1 rounded-bl-xl text-xs font-bold backdrop-blur-sm">
+          مهمة جديدة
         </div>
 
-        <button
-          class="bg-primary text-white py-2 rounded-xl hover:bg-emerald-600"
-          onclick="location.href='tasks.html'">
-          ابدأ المهمة
+        <div class="flex items-start gap-4 mb-4">
+          <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m-9 0V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-5.25c0-.621-.504-1.125-1.125-1.125H4.125C3.504 11.625 3 12.129 3 12.75V18z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a3 3 0 00-3 3v4.5c0 .621.504 1.125 1.125 1.125h3.75c.621 0 1.125-.504 1.125-1.125V6a3 3 0 00-3-3z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1 group-hover:text-emerald-600 transition-colors">${task.title}</h3>
+            <p class="text-sm text-gray-400 line-clamp-2">${task.description}</p>
+          </div>
+        </div>
+        
+        <div class="mt-auto flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+          <div class="flex flex-col">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">المكافأة</span>
+            <span class="text-emerald-600 font-black text-xl">+${task.reward_points}</span>
+          </div>
+          
+          <div class="flex flex-col items-end">
+            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">الوقت</span>
+            <span class="font-bold text-gray-700 font-mono">${task.duration_seconds}s</span>
+          </div>
+        </div>
+
+        <button onclick="location.href='tasks.html'"
+          class="mt-4 w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 hover:shadow-emerald-500/30 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-xl">
+          <span>ابدأ الآن</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:-scale-x-100 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
         </button>
       `;
 

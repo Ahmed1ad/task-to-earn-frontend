@@ -1,5 +1,5 @@
 // ================= GLOBAL CONFIG =================
-window.API = location.hostname === "localhost" || location.hostname === "127.0.0.1"
+window.API = (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:")
   ? "http://localhost:3000"
   : "https://task-to-earn.onrender.com";
 
@@ -93,6 +93,9 @@ function updateUIExtra(user) {
 }
 
 // ================= SIDEBAR LOGIC =================
+// Safe default
+window.closeSidebar = () => { };
+
 window.setupSidebar = function () {
   const menuBtn = document.getElementById("menuBtn");
   const sidebar = document.getElementById("sidebar");

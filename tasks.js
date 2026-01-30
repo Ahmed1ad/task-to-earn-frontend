@@ -1,376 +1,329 @@
-/* ================= CONFIG ================= */
+/* ================= CONFIG & STATE ================= */
 let currentTask = null;
 let timerInterval = null;
 let secondsLeft = 0;
+let activeTab = 'available';
 
-/* ================= INIT ================= */
 /* ================= INIT ================= */
 (async function initTasks() {
-  // Tab Listeners - Attach immediately for responsiveness
-  const tabAvailable = document.getElementById("tabAvailable");
-  const tabCompleted = document.getElementById("tabCompleted");
-
-  if (tabAvailable) tabAvailable.onclick = loadAvailableTasks;
-  if (tabCompleted) tabCompleted.onclick = loadCompletedTasks;
-
-  // Now perform auth check
-  const user = await authCheck();
+  // Auth Check
+  const user = await loadGlobalUserData();
   if (!user) return;
 
-  // Render User Points
-  updateUserPoints(user.points);
-
   // Initial Load
-  await loadAvailableTasks();
+  switchTab('available');
 
-  // Check for active task in background
+  // Check active ad task
   checkActiveTask();
+
+  // Proof Form Listener
+  setupProofForm();
 })();
 
+/* ================= TABS LOGIC ================= */
+window.switchTab = function (tab) {
+  activeTab = tab;
 
-function updateUserPoints(points) {
-  const pointsEl = document.getElementById("userPoints");
-  if (pointsEl) pointsEl.innerText = points;
-}
+  // Update buttons
+  const tabs = ['available', 'manual', 'completed'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+    const container = document.getElementById(`${t}Container`);
 
-/* ================= LOADING & ABS ================= */
-async function loadAvailableTasks() {
-  setActiveTab("available");
-  showSkeleton();
+    if (t === tab) {
+      btn.className = "flex-1 py-3 px-4 rounded-xl bg-gray-900 text-white shadow-lg font-bold transition-all whitespace-nowrap active-tab scale-105";
+      container.classList.remove('hidden');
+    } else {
+      btn.className = "flex-1 py-3 px-4 rounded-xl text-gray-500 font-medium hover:bg-gray-200 transition-all whitespace-nowrap";
+      container.classList.add('hidden');
+    }
+  });
+
+  // Content Loaders
+  if (tab === 'available') loadAvailableTasksTab();
+  if (tab === 'manual') loadManualTasksTab();
+  if (tab === 'completed') loadCompletedTasksTab();
+};
+
+/* ================= LOADING FUNCTIONS ================= */
+async function loadAvailableTasksTab() {
+  const container = document.getElementById('availableContainer');
+  showSkeleton(container);
 
   try {
     const data = await getAvailableTasks();
-
-    if (!data.tasks || data.tasks.length === 0) {
-      showEmpty("لا توجد مهام متاحة حاليًا، عد لاحقًا!");
+    if (!data.tasks || !data.tasks.length) {
+      showEmpty(container, "لا توجد مهام إعلانات متاحة حالياً");
       return;
     }
 
-    renderTasks(data.tasks, "available");
+    container.innerHTML = data.tasks.map((t, i) => renderTaskCard(t, i, 'ad')).join('');
   } catch (e) {
-    console.error("Load Available Error:", e);
-    showEmpty("حدث خطأ في تحميل المهام");
+    showEmpty(container, "خطأ في تحميل المهام");
   }
 }
 
-async function loadCompletedTasks() {
-  setActiveTab("completed");
-  showSkeleton();
+async function loadManualTasksTab() {
+  const container = document.getElementById('manualContainer');
+  showSkeleton(container);
+
+  try {
+    const data = await getManualTasks();
+    if (!data.tasks || !data.tasks.length) {
+      showEmpty(container, "لا توجد مهام يدوية متاحة حالياً");
+      return;
+    }
+
+    container.innerHTML = data.tasks.map((t, i) => renderTaskCard(t, i, 'manual')).join('');
+  } catch (e) {
+    showEmpty(container, "خطأ في تحميل المهام اليدوية");
+  }
+}
+
+async function loadCompletedTasksTab() {
+  const container = document.getElementById('completedTasks');
+  const parent = document.getElementById('completedContainer');
+  showSkeleton(container);
 
   try {
     const data = await getMyTasks();
-    if (!data.tasks) {
-      showEmpty("لم تقم بإتمام أي مهام بعد");
+    if (!data.tasks || !data.tasks.length) {
+      showEmpty(parent, "سجلك فارغ، ابدأ العمل الآن!");
       return;
     }
 
-    // Filter truly completed
-    const completed = data.tasks.filter(t =>
-      t.status === "completed" || t.is_completed === true || t.completed_at
-    );
-
-    if (completed.length === 0) {
-      showEmpty("سجلك نظيف! لم تكمل أي مهام بعد.");
-      return;
-    }
-
-    renderTasks(completed, "completed");
+    container.innerHTML = data.tasks.reverse().map((t, i) => `
+            <div class="bg-white rounded-2xl p-4 border border-gray-100 flex items-center justify-between animate-slide-up shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">${t.title}</h4>
+                        <p class="text-[10px] text-gray-400 font-mono">${new Date(t.completed_at || t.updated_at).toLocaleString('ar-EG')}</p>
+                    </div>
+                </div>
+                <div class="text-emerald-600 font-black">+${t.reward_points}</div>
+            </div>
+        `).join('');
   } catch (e) {
-    console.error("Load History Error:", e);
-    showEmpty("حدث خطأ في تحميل السجل");
+    showEmpty(parent, "خطأ في تحميل السجل");
   }
 }
 
-
-/* ================= RENDERING ================= */
-function renderTasks(tasks, type) {
-  const container = document.getElementById("tasksContainer");
-  container.innerHTML = tasks.map((t, i) => {
-    if (type === "available") return availableTaskCard(t, i);
-    return completedTaskCard(t, i);
-  }).join("");
-}
-
-function availableTaskCard(t, i) {
+/* ================= RENDERING CARDS ================= */
+function renderTaskCard(t, i, type) {
+  const isAd = type === 'ad';
   return `
-  <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col group relative overflow-hidden animate-slide-up" style="animation-delay: ${i * 100}ms">
-    <!-- Icon/Badge -->
-    <div class="absolute top-0 right-0 bg-emerald-100/50 text-emerald-600 px-3 py-1 rounded-bl-xl text-xs font-bold backdrop-blur-sm">
-      مهمة جديدة
-    </div>
+    <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 flex flex-col group relative overflow-hidden animate-slide-up" style="animation-delay: ${i * 100}ms">
+        <div class="absolute top-0 right-0 ${isAd ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-100 text-blue-600'} px-3 py-1 rounded-bl-xl text-xs font-bold backdrop-blur-sm">
+            ${isAd ? 'إعلان سريع' : 'مهمة يدوية'}
+        </div>
+        
+        <div class="flex items-start gap-4 mb-4">
+            <div class="w-12 h-12 rounded-full ${isAd ? 'bg-emerald-50 text-emerald-500' : 'bg-blue-50 text-blue-500'} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+                ${isAd ?
+      '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>' :
+      '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>'}
+            </div>
+            <div>
+                <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1 transition-colors">${t.title}</h3>
+                <p class="text-sm text-gray-400 line-clamp-2">${t.description}</p>
+            </div>
+        </div>
+        
+        <div class="mt-auto flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-400 uppercase font-semibold">المكافأة</span>
+                <span class="${isAd ? 'text-emerald-600' : 'text-blue-600'} font-black text-xl">+${t.reward_points}</span>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] text-gray-400 uppercase font-semibold">${isAd ? 'الوقت' : 'النوع'}</span>
+                <span class="font-bold text-gray-700">${isAd ? t.duration_seconds + 's' : 'إثبات صورة'}</span>
+            </div>
+        </div>
 
-    <div class="flex items-start gap-4 mb-4">
-      <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 shadow-sm layer-shadow">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m-9 0V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-5.25c0-.621-.504-1.125-1.125-1.125H4.125C3.504 11.625 3 12.129 3 12.75V18z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a3 3 0 00-3 3v4.5c0 .621.504 1.125 1.125 1.125h3.75c.621 0 1.125-.504 1.125-1.125V6a3 3 0 00-3-3z" />
-        </svg>
-      </div>
-      <div>
-         <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1 group-hover:text-emerald-600 transition-colors">${t.title}</h3>
-         <p class="text-sm text-gray-400 line-clamp-2">${t.description}</p>
-      </div>
-    </div>
-    
-    <div class="mt-auto flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-      <div class="flex flex-col">
-        <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">المكافأة</span>
-        <span class="text-emerald-600 font-black text-xl">+${t.reward_points}</span>
-      </div>
-      
-      <div class="flex flex-col items-end">
-        <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">الوقت</span>
-        <span class="font-bold text-gray-700 font-mono">${t.duration_seconds}s</span>
-      </div>
-    </div>
-
-    <button onclick='startTask(${JSON.stringify(t)})'
-      class="mt-4 w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 hover:shadow-emerald-500/30 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-xl">
-      <span>ابدأ الآن</span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:-scale-x-100 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-      </svg>
-    </button>
-  </div>`;
+        <button onclick='${isAd ? `startAdTask(${JSON.stringify(t)})` : `openManualTask(${JSON.stringify(t)})`}'
+            class="mt-4 w-full py-3.5 ${isAd ? 'bg-gray-900' : 'bg-blue-600'} text-white rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2">
+            <span>${isAd ? 'مشاهدة الآن' : 'تنفيذ المهمة'}</span>
+            <svg class="h-5 w-5 rtl:-scale-x-100" viewBox="0 0 20 20" fill="currentColor"><path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" /></svg>
+        </button>
+    </div>`;
 }
 
-function completedTaskCard(t, i) {
-  return `
-  <div class="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col hover:opacity-100 transition duration-500 animate-slide-up" style="animation-delay: ${i * 100}ms">
-    <div class="flex justify-between items-start mb-2">
-      <h3 class="font-bold text-gray-700">${t.title}</h3>
-      <div class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
-          <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
-        </svg>
-        مكتملة
-      </div>
-    </div>
-    <div class="text-emerald-600 font-bold text-lg mt-auto">
-      +${t.reward_points} نقطة
-    </div>
-    <div class="text-xs text-gray-400 mt-1 flex items-center gap-1">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      ${t.completed_at ? new Date(t.completed_at).toLocaleDateString("ar-EG") : ""}
-    </div>
-  </div>`;
-}
-
-/* ================= LOGIC ================= */
-async function startTask(task) {
+/* ================= AD TASKS LOGIC ================= */
+window.startAdTask = async function (task) {
   currentTask = task;
-
-  // Start backend tracking
   try {
-    await fetch(API + `/tasks/ads/start/${task.id}`, {
+    await fetch(`${API}/tasks/ads/start/${task.id}`, {
       method: "POST",
       headers: { Authorization: "Bearer " + token }
     });
-  } catch (e) {
-    console.error("Start task error", e);
-  }
+  } catch (e) { }
 
-  // Save state
   localStorage.setItem("activeTask", JSON.stringify({
     taskId: task.id,
     startTime: Date.now(),
     duration: task.duration_seconds
   }));
 
-  // Setup UI
   secondsLeft = task.duration_seconds;
-  updateTimerUI();
+  document.getElementById("taskModal").classList.remove("hidden");
+  document.getElementById("taskModal").classList.add("flex");
+  window.open(task.ad_url, "_blank");
 
+  initAdTimer();
+};
+
+function initAdTimer() {
   const btn = document.getElementById("completeBtn");
-  if (btn) {
-    btn.disabled = true;
-    btn.innerText = `انتظر ${secondsLeft} ثانية...`;
-    btn.className = "w-full py-4 rounded-xl bg-gray-200 text-gray-400 font-bold cursor-not-allowed";
-  }
+  btn.disabled = true;
 
-  const modal = document.getElementById("taskModal");
-  if (modal) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  }
-
-  // Open AD
-  if (task.ad_url) {
-    window.open(task.ad_url, "_blank");
-  }
-
-  // Interval
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     secondsLeft--;
-    updateTimerUI();
+    document.getElementById("timer").innerText = secondsLeft > 0 ? secondsLeft : 0;
+    btn.innerText = `انتظر ${secondsLeft} ثانية...`;
 
     if (secondsLeft <= 0) {
       clearInterval(timerInterval);
-      enableCompleteBtn();
+      btn.disabled = false;
+      btn.innerText = "تحقق وإستلام المكافأة";
+      btn.className = "w-full py-4 rounded-xl bg-emerald-600 text-white font-bold shadow-lg transition-all active:scale-95";
     }
   }, 1000);
 }
 
-function updateTimerUI() {
-  const timerEl = document.getElementById("timer");
-  if (timerEl) timerEl.innerText = secondsLeft > 0 ? secondsLeft : 0;
-
-  const btn = document.getElementById("completeBtn");
-  if (btn && secondsLeft > 0) {
-    btn.innerText = `انتظر ${secondsLeft} ثانية...`;
-  }
-}
-
-function enableCompleteBtn() {
-  const btn = document.getElementById("completeBtn");
-  if (!btn) return;
-
-  btn.disabled = false;
-  btn.innerText = "";
-  btn.innerHTML = `
-    <span>تحقق وحصل النقاط</span>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  `;
-  btn.className = "w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-bold shadow-lg shadow-green-500/30 hover:scale-[1.02] transition flex items-center justify-center gap-2";
-}
-
-async function completeTask() {
+window.completeTask = async function () {
   if (!currentTask) return;
-
   const btn = document.getElementById("completeBtn");
   btn.innerText = "جاري التحقق...";
   btn.disabled = true;
 
   try {
-    const res = await fetch(API + `/tasks/ads/complete/${currentTask.id}`, {
+    const res = await fetch(`${API}/tasks/ads/complete/${currentTask.id}`, {
       method: "POST",
       headers: { Authorization: "Bearer " + token }
     });
     const data = await res.json();
 
     if (data.status === "success") {
-      // Success!
-      const user = await authCheck();
-      if (user) updateUserPoints(user.points); // Update points in UI
-
-      localStorage.removeItem("activeTask");
+      alert(`مبروك! حصلت على ${currentTask.reward_points} نقطة 🎉`);
+      loadGlobalUserData();
       closeModal();
-      loadAvailableTasks(); // Reload
-
-      // Show success toast (simple alert for now or implement toast)
-      alert(`مبروك! حصلت على ${data.reward_points} نقطة 🎉`);
-
+      loadAvailableTasksTab();
     } else {
-      alert("خطأ: " + (data.message || "فشلت العملية"));
-      closeModal();
+      alert("خطأ: " + data.message);
     }
+  } catch (e) { alert("خطأ في الاتصال بالسيرفر"); }
+};
 
-  } catch (e) {
-    alert("خطأ في الاتصال");
-    closeModal();
-  }
-}
-
-async function failTask() {
-  if (currentTask) {
-    try {
-      await fetch(`${API}/tasks/ads/fail/${currentTask.id}`, {
-        method: "POST",
-        headers: { Authorization: "Bearer " + token }
-      });
-    } catch (e) { }
-  }
-  closeModal();
-}
-
-function closeModal() {
-  clearInterval(timerInterval);
-  const modal = document.getElementById("taskModal");
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  }
+window.closeModal = function () {
+  document.getElementById("taskModal").classList.add("hidden");
   localStorage.removeItem("activeTask");
+  clearInterval(timerInterval);
   currentTask = null;
-}
+};
 
+/* ================= MANUAL TASKS LOGIC ================= */
+window.openManualTask = function (task) {
+  document.getElementById("manualTaskId").value = task.id;
+  document.getElementById("manualTaskTitle").innerText = task.title;
+  document.getElementById("manualTaskDesc").innerText = task.description;
+  document.getElementById("manualModal").classList.remove("hidden");
+  document.getElementById("manualModal").classList.add("flex");
+};
 
-/* ================= RECOVERY ================= */
-async function checkActiveTask() {
-  const saved = localStorage.getItem("activeTask");
-  if (!saved) return;
+window.closeManualModal = function () {
+  document.getElementById("manualModal").classList.add("hidden");
+  resetFile();
+};
 
-  const task = JSON.parse(saved);
-  const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
+function setupProofForm() {
+  const proofInput = document.getElementById("proofInput");
+  const proofForm = document.getElementById("proofForm");
 
-  // If task expired too long ago, fail it
-  if (elapsed > (task.duration + 60)) {
-    localStorage.removeItem("activeTask");
+  if (proofInput) {
+    proofInput.onchange = function () {
+      const file = this.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) {
+          alert("حجم الملف كبير جداً (الأقصى 5MB)");
+          this.value = ""; return;
+        }
+        const reader = new FileReader();
+        reader.onload = e => {
+          document.getElementById("imagePreview").src = e.target.result;
+          document.getElementById("uploadPlaceholder").classList.add('hidden');
+          document.getElementById("previewContainer").classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
   }
-  // Else we could theoretically restore the modal, but usually better to let user restart
+
+  if (proofForm) {
+    proofForm.onsubmit = async function (e) {
+      e.preventDefault();
+      const taskId = document.getElementById("manualTaskId").value;
+      const file = document.getElementById("proofInput").files[0];
+
+      if (!file) { alert("يرجى اختيار صورة الإثبات"); return; }
+
+      const btn = document.getElementById("submitProofBtn");
+      btn.disabled = true;
+      btn.innerText = "جاري الرفع...";
+
+      const formData = new FormData();
+      formData.append("proof", file);
+
+      try {
+        const res = await fetch(`${API}/tasks/manual/upload/${taskId}`, {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token },
+          body: formData
+        });
+        const data = await res.json();
+
+        if (data.status === "success") {
+          alert("تم إرسال الإثبات بنجاح! سيتم المراجعة قريباً.");
+          closeManualModal();
+          loadManualTasksTab();
+        } else {
+          alert("خطأ: " + data.message);
+        }
+      } catch (e) { alert("حدث خطأ أثناء الرفع"); }
+      btn.disabled = false;
+      btn.innerText = "إرسال الإثبات";
+    };
+  }
 }
 
+window.resetFile = function () {
+  document.getElementById("proofInput").value = "";
+  document.getElementById("uploadPlaceholder").classList.remove('hidden');
+  document.getElementById("previewContainer").classList.add('hidden');
+};
 
 /* ================= UI HELPERS ================= */
-function setActiveTab(tab) {
-  const avail = document.getElementById("tabAvailable");
-  const comp = document.getElementById("tabCompleted");
-
-  const activeClass = "flex-1 py-3 rounded-xl bg-gray-900 text-white font-bold shadow-lg transition-all";
-  const inactiveClass = "flex-1 py-3 rounded-xl bg-white text-gray-500 font-medium hover:bg-gray-50 transition-all";
-
-  if (tab === "available") {
-    avail.className = activeClass;
-    comp.className = inactiveClass;
-  } else {
-    avail.className = inactiveClass;
-    comp.className = activeClass;
-  }
+function showSkeleton(container) {
+  container.innerHTML = `<div class="h-40 bg-gray-100 rounded-2xl animate-pulse col-span-full"></div>`;
 }
 
-function showSkeleton() {
-  document.getElementById("tasksContainer").innerHTML = `
-    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
-    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
-    <div class="h-40 bg-gray-200/50 rounded-2xl animate-pulse"></div>
-  `;
+function showEmpty(container, text) {
+  container.innerHTML = `
+        <div class="col-span-full py-12 text-center text-gray-500 font-bold">
+            <svg class="w-12 h-12 mx-auto mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4a2 2 0 012-2m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+            ${text}
+        </div>`;
 }
 
-function showEmpty(text) {
-  document.getElementById("tasksContainer").innerHTML = `
-    <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
-      <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
-        </svg>
-      </div>
-      <div class="text-gray-800 text-lg font-bold">${text}</div>
-    </div>
-  `;
-}
-
-/* ================= SIDEBAR ================= */
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-
-if (menuBtn) {
-  menuBtn.onclick = () => {
-    sidebar.classList.remove("translate-x-full");
-    overlay.classList.remove("hidden");
-  };
-}
-
-function closeSidebar() {
-  if (sidebar) sidebar.classList.add("translate-x-full");
-  if (overlay) overlay.classList.add("hidden");
-}
-
-if (overlay) {
-  overlay.onclick = closeSidebar;
+function checkActiveTask() {
+  const saved = localStorage.getItem("activeTask");
+  if (!saved) return;
+  const task = JSON.parse(saved);
+  const elapsed = Math.floor((Date.now() - task.startTime) / 1000);
+  if (elapsed < task.duration) {
+    // Optionally restore the timer, but usually user stays on page
+  } else { localStorage.removeItem("activeTask"); }
 }

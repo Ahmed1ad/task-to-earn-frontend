@@ -209,17 +209,37 @@ window.completeTask = async function () {
 
     if (data.status === "success") {
       alert(`مبروك! حصلت على ${currentTask.reward_points} نقطة 🎉`);
+      localStorage.removeItem("activeTask");
       loadGlobalUserData();
       closeModal();
       loadAvailableTasksTab();
     } else {
-      alert("خطأ: " + data.message);
+      alert("خطأ: " + (data.message || "فشلت العملية"));
+      btn.disabled = false;
+      btn.innerText = "تحقق وإستلام المكافأة";
     }
-  } catch (e) { alert("خطأ في الاتصال بالسيرفر"); }
+  } catch (e) {
+    alert("خطأ في الاتصال بالسيرفر");
+    btn.disabled = false;
+    btn.innerText = "تحقق وإستلام المكافأة";
+  }
+};
+
+window.failTask = async function () {
+  if (currentTask) {
+    try {
+      await fetch(`${API}/tasks/ads/fail/${currentTask.id}`, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token }
+      });
+    } catch (e) { }
+  }
+  closeModal();
 };
 
 window.closeModal = function () {
   document.getElementById("taskModal").classList.add("hidden");
+  document.getElementById("taskModal").classList.remove("flex");
   localStorage.removeItem("activeTask");
   clearInterval(timerInterval);
   currentTask = null;

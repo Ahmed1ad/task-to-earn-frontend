@@ -1,159 +1,106 @@
-// ================= GLOBAL =================
+// ================= GLOBAL CONFIG =================
 window.API = location.hostname === "localhost" || location.hostname === "127.0.0.1"
   ? "http://localhost:3000"
   : "https://task-to-earn.onrender.com";
+
 window.token = localStorage.getItem("token");
 
+// ================= AUTH PROTECTION =================
 const page = location.pathname;
-
-// الصفحات المحمية فقط
-const protectedPages = ["home.html", "tasks.html"];
+const protectedPages = ["home.html", "tasks.html", "profile.html", "withdraw.html"];
 
 if (protectedPages.some(p => page.includes(p)) && !token) {
   location.replace("login.html");
 }
 
-
-// لو المستخدم مسجل دخول بالفعل وهو في صفحة اللوجن، نوديه الهوم
 if (page.includes("login.html") && token) {
   location.replace("home.html");
 }
 
-// ================= AUTH CHECK =================
-// (Auth check definition was here, removed duplicate)
+// ================= CORE FUNCTIONS =================
 
-
-
-// عناصر الصفحة
-const actionBtn = document.getElementById("actionBtn");
-const switchText = document.getElementById("switchText");
-const msg = document.getElementById("msg");
-const usernameInput = document.getElementById("username");
-const usernameField = document.getElementById("usernameField");
-
-let mode = "login"; // login | register
-
-if (actionBtn && switchText) {
-  actionBtn.onclick = submit;
-  switchText.onclick = toggleMode;
-}
-
-// تغيير الوضع
-function toggleMode() {
-  mode = mode === "login" ? "register" : "login";
-
-  document.getElementById("title").innerText =
-    mode === "login"
-      ? "تسجيل الدخول إلى حسابك"
-      : "إنشاء حساب جديد";
-
-  actionBtn.innerText =
-    mode === "login" ? "تسجيل دخول" : "إنشاء حساب";
-
-  switchText.innerText =
-    mode === "login"
-      ? "ليس لديك حساب؟ إنشاء حساب"
-      : "لديك حساب بالفعل؟ تسجيل دخول";
-
-  // إظهار / إخفاء username field
-  if (usernameField) {
-    if (mode === "register") {
-      usernameField.classList.remove("hidden");
-    } else {
-      usernameField.classList.add("hidden");
-    }
-  }
-
-  msg.innerText = "";
-}
-
-// إرسال Login / Register
-async function submit() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const username = usernameInput.value.trim();
-
-  if (!email || !password || (mode === "register" && !username)) {
-    msg.innerText = "من فضلك أدخل جميع البيانات المطلوبة";
-    return;
-  }
-
-  msg.innerText = "جاري التنفيذ...";
-
-  const endpoint =
-    mode === "login" ? "/auth/login" : "/auth/register";
-
-  const body =
-    mode === "login"
-      ? { email, password }
-      : { username, email, password };
-
+// Auth Check from Server
+window.authCheck = async function () {
+  if (!token) return null;
   try {
-    const res = await fetch(API + endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+    const res = await fetch(API + "/auth/check", {
+      headers: { Authorization: "Bearer " + token }
     });
-
+    if (!res.ok) throw new Error("Auth failed");
     const data = await res.json();
 
-    if (data.status === "success") {
-      if (mode === "login") {
-        localStorage.setItem("token", data.token);
-        location.replace("home.html");
-      } else {
-        msg.innerText = "✅ تم إنشاء الحساب، يمكنك تسجيل الدخول الآن";
-        toggleMode();
-      }
-    } else {
-      msg.innerText = data.message || "حدث خطأ";
+    if (data.status === "banned") {
+      alert("تم حظر حسابك");
+      logout();
+      return null;
     }
-
-  } catch {
-    msg.innerText = "خطأ في الاتصال بالسيرفر";
+    return data.user;
+  } catch (e) {
+    console.error("Auth check error:", e);
+    return null;
   }
+};
+
+// Singleton user data loading
+let cachedUser = null;
+let userLoadingPromise = null;
+
+window.loadGlobalUserData = async function () {
+  if (cachedUser) return cachedUser;
+  if (userLoadingPromise) return await userLoadingPromise;
+
+  userLoadingPromise = authCheck();
+  const user = await userLoadingPromise;
+  userLoadingPromise = null;
+
+  if (user) {
+    cachedUser = user;
+    updateUIPoints(user);
+    updateUIUsernames(user);
+    updateUIExtra(user);
+  }
+  return user;
+};
+
+function updateUIPoints(user) {
+  const pointsEls = document.querySelectorAll("#userPoints, #walletPoints, #totalPoints");
+  pointsEls.forEach(el => {
+    // Check if it's a badge with 🪙 or just text
+    if (el.innerHTML.includes('🪙')) {
+      el.childNodes[0].textContent = user.points + " ";
+    } else {
+      el.innerText = user.points;
+    }
+  });
 }
 
+function updateUIUsernames(user) {
+  const nameEls = document.querySelectorAll("#username, #profileUsername");
+  nameEls.forEach(el => el.innerText = user.username);
+}
 
+function updateUIExtra(user) {
+  const emailEls = document.querySelectorAll("#profileEmail");
+  emailEls.forEach(el => el.innerText = user.email || "");
 
-
-// ================= GLOBAL DATA LOAD =================
-window.loadGlobalUserData = async function () {
-  const user = await authCheck();
-  if (!user) return null;
-
-  // Update UI Elements across pages
-  const elements = {
-    username: document.querySelectorAll("#username, #profileUsername"),
-    points: document.querySelectorAll("#userPoints, #walletPoints, #totalPoints"),
-    email: document.querySelectorAll("#profileEmail"),
-    joinDate: document.querySelectorAll("#joinDate")
-  };
-
-  elements.username.forEach(el => el.innerText = user.username);
-  elements.points.forEach(el => el.innerText = user.points);
-
-  if (user.email) elements.email.forEach(el => el.innerText = user.email);
-
-  // Format join date if needed
+  const dateEls = document.querySelectorAll("#joinDate");
   if (user.created_at) {
     const date = new Date(user.created_at).toLocaleDateString("ar-EG", {
       year: 'numeric', month: 'long', day: 'numeric'
     });
-    elements.joinDate.forEach(el => el.innerText = date);
+    dateEls.forEach(el => el.innerText = date);
   }
+}
 
-  return user;
-};
-
-// ================= SIDEBAR & OVERLAY =================
+// ================= SIDEBAR LOGIC =================
 window.setupSidebar = function () {
   const menuBtn = document.getElementById("menuBtn");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
 
   if (menuBtn && sidebar && overlay) {
-    menuBtn.onclick = () => {
+    menuBtn.onclick = (e) => {
+      e.stopPropagation();
       sidebar.classList.remove("translate-x-full");
       overlay.classList.remove("hidden");
     };
@@ -164,6 +111,11 @@ window.setupSidebar = function () {
     };
 
     overlay.onclick = window.closeSidebar;
+
+    // Also handle escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === "Escape") window.closeSidebar();
+    });
   }
 };
 
@@ -184,67 +136,126 @@ window.setupProfileDropdown = function () {
   }
 };
 
-// auto-init common features
-document.addEventListener("DOMContentLoaded", () => {
-  if (token) {
-    loadGlobalUserData();
-    setupSidebar();
-    setupProfileDropdown();
-  }
-});
-
 // ================= LOGOUT =================
 window.logout = function () {
   localStorage.removeItem("token");
   localStorage.removeItem("activeTask");
+  cachedUser = null;
   location.replace("login.html");
 };
 
-// ================= AUTH CHECK =================
-window.authCheck = async function () {
-  if (!token) return null;
-
+// ================= GLOBAL API HELPERS =================
+window.getAvailableTasks = async function () {
   try {
-    const res = await fetch(API + "/auth/check", {
+    const res = await fetch(API + "/tasks/ads", {
       headers: { Authorization: "Bearer " + token }
     });
-
-    const data = await res.json();
-
-    if (data.status === "banned") {
-      alert("تم حظر حسابك");
-      logout();
-      return null;
-    }
-
-    if (data.status !== "success") {
-      return null;
-    }
-
-    return data.user;
-  } catch (e) {
-    return null;
-  }
-};
-
-// ================= TASKS API =================
-window.getAvailableTasks = async function () {
-  const res = await fetch(API + "/tasks/ads", {
-    headers: { Authorization: "Bearer " + token }
-  });
-  return res.json();
+    return await res.json();
+  } catch (e) { return { status: 'error', tasks: [] }; }
 };
 
 window.getManualTasks = async function () {
-  const res = await fetch(API + "/tasks/manual", {
-    headers: { Authorization: "Bearer " + token }
-  });
-  return res.json();
+  try {
+    const res = await fetch(API + "/tasks/manual", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    return await res.json();
+  } catch (e) { return { status: 'error', tasks: [] }; }
 };
 
 window.getMyTasks = async function () {
-  const res = await fetch(API + "/tasks/my", {
-    headers: { Authorization: "Bearer " + token }
-  });
-  return res.json();
+  try {
+    const res = await fetch(API + "/tasks/my", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    return await res.json();
+  } catch (e) { return { status: 'error', tasks: [] }; }
 };
+
+// ================= INIT ON LOAD =================
+(function init() {
+  // Setup UI elements immediately if they exist (don't wait for DOMContentLoaded if script is at end)
+  const runSetup = () => {
+    setupSidebar();
+    setupProfileDropdown();
+    if (token) loadGlobalUserData();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runSetup);
+  } else {
+    runSetup();
+  }
+})();
+
+// ================= LOGIN/REGISTER PAGE LOGIC =================
+// Only runs if on login page
+const authFormInit = () => {
+  const actionBtn = document.getElementById("actionBtn");
+  const switchText = document.getElementById("switchText");
+  const msg = document.getElementById("msg");
+  const usernameInput = document.getElementById("usernameField");
+
+  if (!actionBtn) return;
+
+  let authMode = "login";
+
+  const toggleAuthMode = () => {
+    authMode = authMode === "login" ? "register" : "login";
+    document.getElementById("title").innerText = authMode === "login" ? "تسجيل الدخول إلى حسابك" : "إنشاء حساب جديد";
+    actionBtn.innerText = authMode === "login" ? "تسجيل دخول" : "إنشاء حساب";
+    switchText.innerText = authMode === "login" ? "ليس لديك حساب؟ إنشاء حساب" : "لديك حساب بالفعل؟ تسجيل دخول";
+
+    if (usernameInput) {
+      authMode === "register" ? usernameInput.classList.remove("hidden") : usernameInput.classList.add("hidden");
+    }
+    msg.innerText = "";
+  };
+
+  switchText.onclick = toggleAuthMode;
+
+  actionBtn.onclick = async () => {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const username = document.getElementById("username") ? document.getElementById("username").value.trim() : "";
+
+    if (!email || !password || (authMode === "register" && !username)) {
+      msg.innerText = "من فضلك أدخل جميع البيانات المطلوبة";
+      return;
+    }
+
+    msg.innerText = "جاري التنفيذ...";
+    const endpoint = authMode === "login" ? "/auth/login" : "/auth/register";
+    const body = authMode === "login" ? { email, password } : { username, email, password };
+
+    try {
+      const res = await fetch(API + endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+
+      if (data.status === "success") {
+        if (authMode === "login") {
+          localStorage.setItem("token", data.token);
+          location.replace("home.html");
+        } else {
+          msg.innerText = "✅ تم إنشاء الحساب، يمكنك تسجيل الدخول الآن";
+          toggleAuthMode();
+        }
+      } else {
+        msg.innerText = data.message || "حدث خطأ";
+      }
+    } catch (e) {
+      msg.innerText = "خطأ في الاتصال بالسيرفر";
+    }
+  };
+};
+
+// Run auth form init on load
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", authFormInit);
+} else {
+  authFormInit();
+}

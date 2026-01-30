@@ -6,14 +6,18 @@ window.API = (location.hostname === "localhost" || location.hostname === "127.0.
 window.token = localStorage.getItem("token");
 
 // ================= AUTH PROTECTION =================
-const page = location.pathname;
+const currentPage = location.pathname;
 const protectedPages = ["home.html", "tasks.html", "profile.html", "withdraw.html"];
 
-if (protectedPages.some(p => page.includes(p)) && !token) {
+// Improved check for protected pages to handle file paths
+const isProtected = protectedPages.some(pageName => currentPage.endsWith(pageName));
+const isLogin = currentPage.endsWith("login.html");
+
+if (isProtected && !window.token) {
   location.replace("login.html");
 }
 
-if (page.includes("login.html") && token) {
+if (isLogin && window.token) {
   location.replace("home.html");
 }
 
@@ -21,22 +25,30 @@ if (page.includes("login.html") && token) {
 
 // Auth Check from Server
 window.authCheck = async function () {
-  if (!token) return null;
+  if (!window.token) return null;
   try {
-    const res = await fetch(API + "/auth/check", {
-      headers: { Authorization: "Bearer " + token }
+    const res = await fetch(window.API + "/auth/check", {
+      headers: { Authorization: "Bearer " + window.token }
     });
+
+    // Handle 401/403 explicitly
+    if (res.status === 401 || res.status === 403) {
+      window.logout();
+      return null;
+    }
+
     if (!res.ok) throw new Error("Auth failed");
     const data = await res.json();
 
     if (data.status === "banned") {
       alert("تم حظر حسابك");
-      logout();
+      window.logout();
       return null;
     }
     return data.user;
   } catch (e) {
     console.error("Auth check error:", e);
+    // Return null mostly, but don't logout on network error immediately to avoid bad UX
     return null;
   }
 };
@@ -49,7 +61,7 @@ window.loadGlobalUserData = async function () {
   if (cachedUser) return cachedUser;
   if (userLoadingPromise) return await userLoadingPromise;
 
-  userLoadingPromise = authCheck();
+  userLoadingPromise = window.authCheck();
   const user = await userLoadingPromise;
   userLoadingPromise = null;
 
@@ -65,7 +77,6 @@ window.loadGlobalUserData = async function () {
 function updateUIPoints(user) {
   const pointsEls = document.querySelectorAll("#userPoints, #walletPoints, #totalPoints");
   pointsEls.forEach(el => {
-    // Check if it's a badge with 🪙 or just text
     if (el.innerHTML.includes('🪙')) {
       el.childNodes[0].textContent = user.points + " ";
     } else {
@@ -84,7 +95,8 @@ function updateUIExtra(user) {
   emailEls.forEach(el => el.innerText = user.email || "");
 
   const dateEls = document.querySelectorAll("#joinDate");
-  if (user.created_at) {
+  // Check if dateEls exist (might not be on every page)
+  if (dateEls.length && user.created_at) {
     const date = new Date(user.created_at).toLocaleDateString("ar-EG", {
       year: 'numeric', month: 'long', day: 'numeric'
     });
@@ -93,8 +105,13 @@ function updateUIExtra(user) {
 }
 
 // ================= SIDEBAR LOGIC =================
-// Safe default
-window.closeSidebar = () => { };
+// Define closeSidebar globally first to allow calling from HTML if needed
+window.closeSidebar = function () {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  if (sidebar) sidebar.classList.add("translate-x-full");
+  if (overlay) overlay.classList.add("hidden");
+};
 
 window.setupSidebar = function () {
   const menuBtn = document.getElementById("menuBtn");
@@ -102,23 +119,21 @@ window.setupSidebar = function () {
   const overlay = document.getElementById("overlay");
 
   if (menuBtn && sidebar && overlay) {
+    // Remove existing listeners if any (by replacing node - optional, but simple assignment is enough for onclick)
     menuBtn.onclick = (e) => {
       e.stopPropagation();
       sidebar.classList.remove("translate-x-full");
       overlay.classList.remove("hidden");
     };
 
-    window.closeSidebar = () => {
-      sidebar.classList.add("translate-x-full");
-      overlay.classList.add("hidden");
-    };
-
     overlay.onclick = window.closeSidebar;
 
-    // Also handle escape key
+    // Handle escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === "Escape") window.closeSidebar();
     });
+  } else {
+    console.warn("Sidebar elements not found on this page.");
   }
 };
 
@@ -133,9 +148,15 @@ window.setupProfileDropdown = function () {
       profileMenu.classList.toggle("hidden");
     };
 
+    // Close when clicking outside
     document.addEventListener("click", () => {
-      profileMenu.classList.add("hidden");
+      if (!profileMenu.classList.contains("hidden")) {
+        profileMenu.classList.add("hidden");
+      }
     });
+
+    // Prevent closing when clicking inside the menu
+    profileMenu.onclick = (e) => e.stopPropagation();
   }
 };
 
@@ -149,27 +170,30 @@ window.logout = function () {
 
 // ================= GLOBAL API HELPERS =================
 window.getAvailableTasks = async function () {
+  if (!window.token) return { status: 'error', tasks: [] };
   try {
-    const res = await fetch(API + "/tasks/ads", {
-      headers: { Authorization: "Bearer " + token }
+    const res = await fetch(window.API + "/tasks/ads", {
+      headers: { Authorization: "Bearer " + window.token }
     });
     return await res.json();
   } catch (e) { return { status: 'error', tasks: [] }; }
 };
 
 window.getManualTasks = async function () {
+  if (!window.token) return { status: 'error', tasks: [] };
   try {
-    const res = await fetch(API + "/tasks/manual", {
-      headers: { Authorization: "Bearer " + token }
+    const res = await fetch(window.API + "/tasks/manual", {
+      headers: { Authorization: "Bearer " + window.token }
     });
     return await res.json();
   } catch (e) { return { status: 'error', tasks: [] }; }
 };
 
 window.getMyTasks = async function () {
+  if (!window.token) return { status: 'error', tasks: [] };
   try {
-    const res = await fetch(API + "/tasks/my", {
-      headers: { Authorization: "Bearer " + token }
+    const res = await fetch(window.API + "/tasks/my", {
+      headers: { Authorization: "Bearer " + window.token }
     });
     return await res.json();
   } catch (e) { return { status: 'error', tasks: [] }; }
@@ -177,22 +201,25 @@ window.getMyTasks = async function () {
 
 // ================= INIT ON LOAD =================
 (function init() {
-  // Setup UI elements immediately if they exist (don't wait for DOMContentLoaded if script is at end)
   const runSetup = () => {
-    setupSidebar();
-    setupProfileDropdown();
-    if (token) loadGlobalUserData();
+    try {
+      window.setupSidebar();
+      window.setupProfileDropdown();
+      if (window.token) window.loadGlobalUserData();
+    } catch (err) {
+      console.error("Initialization error:", err);
+    }
   };
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", runSetup);
-  } else {
+  // Check if DOM is already ready
+  if (document.readyState === "interactive" || document.readyState === "complete") {
     runSetup();
+  } else {
+    document.addEventListener("DOMContentLoaded", runSetup);
   }
 })();
 
 // ================= LOGIN/REGISTER PAGE LOGIC =================
-// Only runs if on login page
 const authFormInit = () => {
   const actionBtn = document.getElementById("actionBtn");
   const switchText = document.getElementById("switchText");
@@ -232,7 +259,7 @@ const authFormInit = () => {
     const body = authMode === "login" ? { email, password } : { username, email, password };
 
     try {
-      const res = await fetch(API + endpoint, {
+      const res = await fetch(window.API + endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
@@ -256,7 +283,6 @@ const authFormInit = () => {
   };
 };
 
-// Run auth form init on load
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", authFormInit);
 } else {

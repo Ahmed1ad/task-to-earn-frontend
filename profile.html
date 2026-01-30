@@ -422,144 +422,88 @@
             profileMenu.classList.toggle("hidden");
         };
 
-        // Load user data
-        async function loadUser() {
-            try {
-                const res = await fetch(`${API}/me`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                const data = await res.json();
+        /* ================= INITIALIZE ================= */
+        // Sidebar, user data, and dropdown are handled by main.js automatically
 
-                if (data.status === "success" && data.user) {
-                    const user = data.user;
+        async function initProfile() {
+            const user = await loadGlobalUserData();
+            if (!user) return;
 
-                    // Update header and profile sections
-                    if (document.getElementById("username"))
-                        document.getElementById("username").innerText = user.username;
-                    if (document.getElementById("userPoints"))
-                        document.getElementById("userPoints").innerText = user.points;
-                    if (document.getElementById("profileUsername"))
-                        document.getElementById("profileUsername").innerText = user.username;
-                    if (document.getElementById("profileEmail"))
-                        document.getElementById("profileEmail").innerText = user.email;
-                    if (document.getElementById("totalPoints"))
-                        document.getElementById("totalPoints").innerText = user.points;
-
-                    // Format join date
-                    if (user.created_at && document.getElementById("joinDate")) {
-                        const date = new Date(user.created_at).toLocaleDateString("ar-EG", {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        });
-                        document.getElementById("joinDate").innerText = date;
-                    }
-
-                    // Calculate user level based on points
-                    const levelEl = document.getElementById("userLevel");
-                    if (levelEl) {
-                        if (user.points < 100) levelEl.innerText = "مبتدئ";
-                        else if (user.points < 500) levelEl.innerText = "متوسط";
-                        else if (user.points < 1000) levelEl.innerText = "متقدم";
-                        else levelEl.innerText = "خبير";
-                    }
-                }
-            } catch (err) {
-                console.error("Error loading user:", err);
+            // Display Referral Code
+            if (user.referral_code) {
+                document.getElementById("referralCode").innerText = user.referral_code;
             }
+
+            // Calculate level
+            const levelEl = document.getElementById("userLevel");
+            if (levelEl) {
+                if (user.points < 100) levelEl.innerText = "مبتدئ";
+                else if (user.points < 500) levelEl.innerText = "متوسط";
+                else if (user.points < 1000) levelEl.innerText = "متقدم";
+                else levelEl.innerText = "خبير";
+            }
+
+            // Load extra stats
+            loadExtraStats();
         }
 
-        // Load completed tasks count
-        async function loadTasksStats() {
+        async function loadExtraStats() {
             try {
-                const res = await fetch(`${API}/tasks/my`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                const data = await res.json();
+                const [tasksRes, withdrawsRes] = await Promise.all([
+                    getMyTasks(),
+                    fetch(`${API}/withdraw/my`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json())
+                ]);
 
-                if (data.status === "success" && data.tasks) {
-                    const completedCount = data.tasks.length;
-                    if (document.getElementById("completedTasks"))
-                        document.getElementById("completedTasks").innerText = completedCount;
-
-                    // Load recent activity
-                    loadRecentActivity(data.tasks);
+                if (tasksRes.status === "success") {
+                    document.getElementById("completedTasks").innerText = tasksRes.tasks.length;
+                    renderActivity(tasksRes.tasks);
                 }
-            } catch (err) {
-                console.error("Error loading tasks stats:", err);
-            }
+
+                if (withdrawsRes.status === "success") {
+                    const pending = withdrawsRes.withdrawals.filter(w => w.status === 'pending').length;
+                    document.getElementById("pendingWithdrawals").innerText = pending;
+                }
+            } catch (e) { console.error(e); }
         }
 
-        // Load withdrawals count
-        async function loadWithdrawalsStats() {
-            try {
-                const res = await fetch(`${API}/withdraw/my`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                const data = await res.json();
-
-                if (data.status === "success" && data.withdrawals) {
-                    const pendingCount = data.withdrawals.filter(w => w.status === 'pending').length;
-                    if (document.getElementById("pendingWithdrawals"))
-                        document.getElementById("pendingWithdrawals").innerText = pendingCount;
-                }
-            } catch (err) {
-                console.error("Error loading withdrawals stats:", err);
-            }
-        }
-
-        // Load recent activity
-        function loadRecentActivity(tasks) {
-            const activityContainer = document.getElementById("recentActivity");
+        function renderActivity(tasks) {
+            const container = document.getElementById("recentActivity");
             const noActivity = document.getElementById("noActivity");
 
-            if (!tasks || tasks.length === 0) {
-                activityContainer.innerHTML = "";
+            if (!tasks.length) {
                 noActivity.classList.remove("hidden");
                 return;
             }
 
             noActivity.classList.add("hidden");
+            const recent = tasks.slice(-5).reverse();
 
-            // Show last 5 tasks
-            const recentTasks = tasks.slice(-5).reverse();
-
-            activityContainer.innerHTML = recentTasks.map(task => {
-                const date = new Date(task.completed_at).toLocaleDateString("ar-EG", {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-
+            container.innerHTML = recent.map(t => {
+                const date = new Date(t.completed_at).toLocaleDateString("ar-EG", { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 return `
-          <div class="border border-gray-200 rounded-xl p-4 hover:shadow-md transition flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <p class="font-bold text-gray-800">أكملت مهمة</p>
-                <p class="text-xs text-gray-500">${date}</p>
-              </div>
-            </div>
-            <div class="text-left">
-              <p class="text-emerald-600 font-black text-lg">+${task.reward_points}</p>
-              <p class="text-xs text-gray-400">نقطة</p>
-            </div>
-          </div>
-        `;
+                    <div class="border border-gray-200 rounded-xl p-4 hover:shadow-md transition flex items-center justify-between animate-fade-in">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" /></svg>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800">أكملت مهمة</p>
+                                <p class="text-[10px] text-gray-400">${date}</p>
+                            </div>
+                        </div>
+                        <div class="text-left"><p class="text-emerald-600 font-black">+${t.reward_points}</p></div>
+                    </div>`;
             }).join("");
         }
 
-        // Initialize
-        if (token) {
-            loadUser();
-            loadTasksStats();
-            loadWithdrawalsStats();
-        }
+        window.copyReferral = () => {
+            const code = document.getElementById("referralCode").innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert("تم نسخ كود الإحالة بنجاح! 📋");
+            });
+        };
+
+        if (token) initProfile();
     </script>
 
 </body>

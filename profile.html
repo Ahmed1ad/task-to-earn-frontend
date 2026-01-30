@@ -397,31 +397,6 @@
     <!-- ================= Script ================= -->
     <script src="main.js"></script>
     <script>
-        // Sidebar
-        const menuBtn = document.getElementById("menuBtn");
-        const sidebar = document.getElementById("sidebar");
-        const overlay = document.getElementById("overlay");
-
-        menuBtn.onclick = () => {
-            sidebar.classList.remove("translate-x-full");
-            overlay.classList.remove("hidden");
-        };
-
-        function closeSidebar() {
-            sidebar.classList.add("translate-x-full");
-            overlay.classList.add("hidden");
-        }
-
-        overlay.onclick = closeSidebar;
-
-        // Profile dropdown
-        const profileBtn = document.getElementById("profileBtn");
-        const profileMenu = document.getElementById("profileMenu");
-
-        profileBtn.onclick = () => {
-            profileMenu.classList.toggle("hidden");
-        };
-
         /* ================= INITIALIZE ================= */
         // Sidebar, user data, and dropdown are handled by main.js automatically
 

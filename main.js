@@ -117,18 +117,92 @@ async function submit() {
 
 
 
+// ================= GLOBAL DATA LOAD =================
+window.loadGlobalUserData = async function () {
+  const user = await authCheck();
+  if (!user) return null;
+
+  // Update UI Elements across pages
+  const elements = {
+    username: document.querySelectorAll("#username, #profileUsername"),
+    points: document.querySelectorAll("#userPoints, #walletPoints, #totalPoints"),
+    email: document.querySelectorAll("#profileEmail"),
+    joinDate: document.querySelectorAll("#joinDate")
+  };
+
+  elements.username.forEach(el => el.innerText = user.username);
+  elements.points.forEach(el => el.innerText = user.points);
+
+  if (user.email) elements.email.forEach(el => el.innerText = user.email);
+
+  // Format join date if needed
+  if (user.created_at) {
+    const date = new Date(user.created_at).toLocaleDateString("ar-EG", {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+    elements.joinDate.forEach(el => el.innerText = date);
+  }
+
+  return user;
+};
+
+// ================= SIDEBAR & OVERLAY =================
+window.setupSidebar = function () {
+  const menuBtn = document.getElementById("menuBtn");
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+
+  if (menuBtn && sidebar && overlay) {
+    menuBtn.onclick = () => {
+      sidebar.classList.remove("translate-x-full");
+      overlay.classList.remove("hidden");
+    };
+
+    window.closeSidebar = () => {
+      sidebar.classList.add("translate-x-full");
+      overlay.classList.add("hidden");
+    };
+
+    overlay.onclick = window.closeSidebar;
+  }
+};
+
+// ================= PROFILE DROPDOWN =================
+window.setupProfileDropdown = function () {
+  const profileBtn = document.getElementById("profileBtn");
+  const profileMenu = document.getElementById("profileMenu");
+
+  if (profileBtn && profileMenu) {
+    profileBtn.onclick = (e) => {
+      e.stopPropagation();
+      profileMenu.classList.toggle("hidden");
+    };
+
+    document.addEventListener("click", () => {
+      profileMenu.classList.add("hidden");
+    });
+  }
+};
+
+// auto-init common features
+document.addEventListener("DOMContentLoaded", () => {
+  if (token) {
+    loadGlobalUserData();
+    setupSidebar();
+    setupProfileDropdown();
+  }
+});
+
 // ================= LOGOUT =================
 window.logout = function () {
   localStorage.removeItem("token");
+  localStorage.removeItem("activeTask");
   location.replace("login.html");
 };
 
 // ================= AUTH CHECK =================
 window.authCheck = async function () {
-  if (!token) {
-    logout();
-    return null;
-  }
+  if (!token) return null;
 
   try {
     const res = await fetch(API + "/auth/check", {
@@ -144,13 +218,11 @@ window.authCheck = async function () {
     }
 
     if (data.status !== "success") {
-      logout();
       return null;
     }
 
     return data.user;
   } catch (e) {
-    logout();
     return null;
   }
 };
@@ -158,6 +230,13 @@ window.authCheck = async function () {
 // ================= TASKS API =================
 window.getAvailableTasks = async function () {
   const res = await fetch(API + "/tasks/ads", {
+    headers: { Authorization: "Bearer " + token }
+  });
+  return res.json();
+};
+
+window.getManualTasks = async function () {
+  const res = await fetch(API + "/tasks/manual", {
     headers: { Authorization: "Bearer " + token }
   });
   return res.json();

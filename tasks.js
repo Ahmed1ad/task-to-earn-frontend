@@ -7,7 +7,8 @@ let activeTab = 'available';
 /* ================= INIT ================= */
 (async function initTasks() {
   // Auth Check
-  const user = await loadGlobalUserData();
+  if (!window.loadGlobalUserData) return;
+  const user = await window.loadGlobalUserData();
   if (!user) return;
 
   // Initial Load
@@ -51,7 +52,7 @@ async function loadAvailableTasksTab() {
   showSkeleton(container);
 
   try {
-    const data = await getAvailableTasks();
+    const data = await window.getAvailableTasks();
     if (!data.tasks || !data.tasks.length) {
       showEmpty(container, "لا توجد مهام إعلانات متاحة حالياً");
       return;
@@ -68,7 +69,7 @@ async function loadManualTasksTab() {
   showSkeleton(container);
 
   try {
-    const data = await getManualTasks();
+    const data = await window.getManualTasks();
     if (!data.tasks || !data.tasks.length) {
       showEmpty(container, "لا توجد مهام يدوية متاحة حالياً");
       return;
@@ -86,7 +87,7 @@ async function loadCompletedTasksTab() {
   showSkeleton(container);
 
   try {
-    const data = await getMyTasks();
+    const data = await window.getMyTasks();
     if (!data.tasks || !data.tasks.length) {
       showEmpty(parent, "سجلك فارغ، ابدأ العمل الآن!");
       return;
@@ -155,9 +156,9 @@ function renderTaskCard(t, i, type) {
 window.startAdTask = async function (task) {
   currentTask = task;
   try {
-    await fetch(`${API}/tasks/ads/start/${task.id}`, {
+    await fetch(`${window.API}/tasks/ads/start/${task.id}`, {
       method: "POST",
-      headers: { Authorization: "Bearer " + token }
+      headers: { Authorization: "Bearer " + window.token }
     });
   } catch (e) { }
 
@@ -201,16 +202,16 @@ window.completeTask = async function () {
   btn.disabled = true;
 
   try {
-    const res = await fetch(`${API}/tasks/ads/complete/${currentTask.id}`, {
+    const res = await fetch(`${window.API}/tasks/ads/complete/${currentTask.id}`, {
       method: "POST",
-      headers: { Authorization: "Bearer " + token }
+      headers: { Authorization: "Bearer " + window.token }
     });
     const data = await res.json();
 
     if (data.status === "success") {
       alert(`مبروك! حصلت على ${currentTask.reward_points} نقطة 🎉`);
       localStorage.removeItem("activeTask");
-      loadGlobalUserData();
+      if (window.loadGlobalUserData) window.loadGlobalUserData();
       closeModal();
       loadAvailableTasksTab();
     } else {
@@ -228,9 +229,9 @@ window.completeTask = async function () {
 window.failTask = async function () {
   if (currentTask) {
     try {
-      await fetch(`${API}/tasks/ads/fail/${currentTask.id}`, {
+      await fetch(`${window.API}/tasks/ads/fail/${currentTask.id}`, {
         method: "POST",
-        headers: { Authorization: "Bearer " + token }
+        headers: { Authorization: "Bearer " + window.token }
       });
     } catch (e) { }
   }
@@ -298,9 +299,9 @@ function setupProofForm() {
       formData.append("proof", file);
 
       try {
-        const res = await fetch(`${API}/tasks/manual/upload/${taskId}`, {
+        const res = await fetch(`${window.API}/tasks/manual/upload/${taskId}`, {
           method: "POST",
-          headers: { Authorization: "Bearer " + token },
+          headers: { Authorization: "Bearer " + window.token },
           body: formData
         });
         const data = await res.json();

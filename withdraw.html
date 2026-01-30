@@ -280,64 +280,74 @@
         // Sidebar, user data, and dropdown are handled by main.js automatically
 
         async function initWithdraw() {
-            const user = await loadGlobalUserData();
-            if (user) await loadWithdrawals();
+            if (window.loadGlobalUserData) await window.loadGlobalUserData();
+            await loadWithdrawals();
         }
 
         // Submit withdraw request
-        document.getElementById("withdrawForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
+        const form = document.getElementById("withdrawForm");
+        if (form) {
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
 
-            const amount = parseInt(document.getElementById("amount").value);
-            const method = document.getElementById("method").value;
-            const wallet = document.getElementById("wallet").value;
+                const amount = parseInt(document.getElementById("amount").value);
+                const method = document.getElementById("method").value;
+                const wallet = document.getElementById("wallet").value;
 
-            if (amount < 10) {
-                alert("الحد الأدنى للسحب هو 10 نقاط");
-                return;
-            }
-
-            const btn = e.target.querySelector('button');
-            const originalText = btn.innerHTML;
-            btn.innerText = "جاري الإرسال...";
-            btn.disabled = true;
-
-            try {
-                const res = await fetch(`${API}/withdraw/request`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        amount_points: amount,
-                        method: method,
-                        wallet_or_number: wallet
-                    })
-                });
-
-                const data = await res.json();
-
-                if (data.status === "success") {
-                    alert("تم إرسال طلب السحب بنجاح! 🎉");
-                    document.getElementById("withdrawForm").reset();
-                    await initWithdraw(); // Refresh data
-                } else {
-                    alert("خطأ: " + (data.message || "فشل طلب السحب"));
+                if (amount < 10) {
+                    alert("الحد الأدنى للسحب هو 10 نقاط");
+                    return;
                 }
-            } catch (err) {
-                alert("حدث خطأ في الإرسال");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        });
+
+                if (!window.token) {
+                    alert("يجب تسجيل الدخول أولاً");
+                    return;
+                }
+
+                const btn = e.target.querySelector('button');
+                const originalText = btn.innerHTML;
+                btn.innerText = "جاري الإرسال...";
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch(`${window.API}/withdraw/request`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${window.token}`
+                        },
+                        body: JSON.stringify({
+                            amount_points: amount,
+                            method: method,
+                            wallet_or_number: wallet
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.status === "success") {
+                        alert("تم إرسال طلب السحب بنجاح! 🎉");
+                        document.getElementById("withdrawForm").reset();
+                        await initWithdraw(); // Refresh data
+                    } else {
+                        alert("خطأ: " + (data.message || "فشل طلب السحب"));
+                    }
+                } catch (err) {
+                    alert("حدث خطأ في الإرسال");
+                } finally {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            });
+        }
 
         // Load withdrawal history
         async function loadWithdrawals() {
             try {
-                const res = await fetch(`${API}/withdraw/my`, {
-                    headers: { Authorization: `Bearer ${token}` }
+                if (!window.token || !window.API) return;
+
+                const res = await fetch(`${window.API}/withdraw/my`, {
+                    headers: { Authorization: `Bearer ${window.token}` }
                 });
                 const data = await res.json();
 
@@ -384,12 +394,8 @@
             } catch (err) { console.error(err); }
         }
 
-        if (token) initWithdraw();
-
-        // Initialize
-        if (token) {
-            loadUser();
-            loadWithdrawals();
+        if (window.token) {
+            initWithdraw();
         }
     </script>
 

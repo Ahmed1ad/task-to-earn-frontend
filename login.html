@@ -176,60 +176,61 @@
       window.location.href = "home.html";
     }
 
-    const title = document.getElementById("title");
-    const usernameField = document.getElementById("usernameField");
-    const username = document.getElementById("username");
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const actionBtn = document.getElementById("actionBtn");
-    const msg = document.getElementById("msg");
-    const switchText = document.getElementById("switchText");
+    // Use the variables already declared in main.js or define them if missing
+    const _title = document.getElementById("title");
+    const _usernameField = document.getElementById("usernameField");
+    const _username = document.getElementById("username");
+    const _email = document.getElementById("email");
+    const _password = document.getElementById("password");
+    const _actionBtn = document.getElementById("actionBtn");
+    const _msg = document.getElementById("msg");
+    const _switchText = document.getElementById("switchText");
 
     let isLogin = true;
 
     // Toggle between login and register
-    switchText.onclick = () => {
+    _switchText.onclick = () => {
       isLogin = !isLogin;
       if (isLogin) {
-        title.innerText = "تسجيل الدخول إلى حسابك";
-        usernameField.classList.add("hidden");
-        actionBtn.innerHTML = `
+        _title.innerText = "تسجيل الدخول إلى حسابك";
+        _usernameField.classList.add("hidden");
+        _actionBtn.innerHTML = `
           <span>تسجيل دخول</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z" clip-rule="evenodd" />
           </svg>
         `;
-        switchText.innerText = "إنشاء حساب";
+        _switchText.innerText = "إنشاء حساب";
       } else {
-        title.innerText = "إنشاء حساب جديد";
-        usernameField.classList.remove("hidden");
-        actionBtn.innerHTML = `
+        _title.innerText = "إنشاء حساب جديد";
+        _usernameField.classList.remove("hidden");
+        _actionBtn.innerHTML = `
           <span>إنشاء حساب</span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z" clip-rule="evenodd" />
           </svg>
         `;
-        switchText.innerText = "تسجيل دخول";
+        _switchText.innerText = "تسجيل دخول";
       }
-      msg.innerText = "";
+      _msg.innerText = "";
     };
 
     // Handle form submission
-    actionBtn.onclick = async () => {
-      const emailVal = email.value.trim();
-      const passwordVal = password.value.trim();
+    _actionBtn.onclick = async () => {
+      const emailVal = _email.value.trim();
+      const passwordVal = _password.value.trim();
 
       if (!emailVal || !passwordVal) {
-        msg.innerText = "يرجى ملء جميع الحقول";
-        msg.classList.remove("text-green-500");
-        msg.classList.add("text-red-500");
+        _msg.innerText = "يرجى ملء جميع الحقول";
+        _msg.classList.remove("text-green-500");
+        _msg.classList.add("text-red-500");
         return;
       }
 
       if (isLogin) {
         // Login
         try {
-          const res = await fetch(`${API}/login`, {
+          const res = await fetch(`${API}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: emailVal, password: passwordVal })
@@ -238,32 +239,32 @@
 
           if (data.status === "success") {
             localStorage.setItem("token", data.token);
-            msg.innerText = "تم تسجيل الدخول بنجاح!";
-            msg.classList.remove("text-red-500");
-            msg.classList.add("text-green-500");
+            _msg.innerText = "تم تسجيل الدخول بنجاح!";
+            _msg.classList.remove("text-red-500");
+            _msg.classList.add("text-green-500");
             setTimeout(() => window.location.href = "home.html", 500);
           } else {
-            msg.innerText = data.message || "خطأ في تسجيل الدخول";
-            msg.classList.remove("text-green-500");
-            msg.classList.add("text-red-500");
+            _msg.innerText = data.message || "خطأ في تسجيل الدخول";
+            _msg.classList.remove("text-green-500");
+            _msg.classList.add("text-red-500");
           }
         } catch (err) {
-          msg.innerText = "حدث خطأ، حاول مرة أخرى";
-          msg.classList.remove("text-green-500");
-          msg.classList.add("text-red-500");
+          _msg.innerText = "حدث خطأ، حاول مرة أخرى";
+          _msg.classList.remove("text-green-500");
+          _msg.classList.add("text-red-500");
         }
       } else {
         // Register
-        const usernameVal = username.value.trim();
+        const usernameVal = _username.value.trim();
         if (!usernameVal) {
-          msg.innerText = "يرجى إدخال اسم المستخدم";
-          msg.classList.remove("text-green-500");
-          msg.classList.add("text-red-500");
+          _msg.innerText = "يرجى إدخال اسم المستخدم";
+          _msg.classList.remove("text-green-500");
+          _msg.classList.add("text-red-500");
           return;
         }
 
         try {
-          const res = await fetch(`${API}/register`, {
+          const res = await fetch(`${API}/auth/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -275,28 +276,28 @@
           const data = await res.json();
 
           if (data.status === "success") {
-            localStorage.setItem("token", data.token);
-            msg.innerText = "تم إنشاء الحساب بنجاح!";
-            msg.classList.remove("text-red-500");
-            msg.classList.add("text-green-500");
-            setTimeout(() => window.location.href = "home.html", 500);
+            _msg.innerText = "تم إنشاء الحساب بنجاح! يمكنك الدخول الآن.";
+            _msg.classList.remove("text-red-500");
+            _msg.classList.add("text-green-500");
+            // Switch back to login
+            setTimeout(() => _switchText.click(), 1500);
           } else {
-            msg.innerText = data.message || "خطأ في إنشاء الحساب";
-            msg.classList.remove("text-green-500");
-            msg.classList.add("text-red-500");
+            _msg.innerText = data.message || "خطأ في إنشاء الحساب";
+            _msg.classList.remove("text-green-500");
+            _msg.classList.add("text-red-500");
           }
         } catch (err) {
-          msg.innerText = "حدث خطأ، حاول مرة أخرى";
-          msg.classList.remove("text-green-500");
-          msg.classList.add("text-red-500");
+          _msg.innerText = "حدث خطأ، حاول مرة أخرى";
+          _msg.classList.remove("text-green-500");
+          _msg.classList.add("text-red-500");
         }
       }
     };
 
     // Allow Enter key to submit
-    [email, password, username].forEach(input => {
+    [_email, _password, _username].forEach(input => {
       input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") actionBtn.click();
+        if (e.key === "Enter") _actionBtn.click();
       });
     });
   </script>

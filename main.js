@@ -29,6 +29,7 @@ const actionBtn = document.getElementById("actionBtn");
 const switchText = document.getElementById("switchText");
 const msg = document.getElementById("msg");
 const usernameInput = document.getElementById("username");
+const usernameField = document.getElementById("usernameField");
 
 let mode = "login"; // login | register
 
@@ -54,11 +55,13 @@ function toggleMode() {
       ? "ليس لديك حساب؟ إنشاء حساب"
       : "لديك حساب بالفعل؟ تسجيل دخول";
 
-  // إظهار / إخفاء username
-  if (mode === "register") {
-    usernameInput.classList.remove("hidden");
-  } else {
-    usernameInput.classList.add("hidden");
+  // إظهار / إخفاء username field
+  if (usernameField) {
+    if (mode === "register") {
+      usernameField.classList.remove("hidden");
+    } else {
+      usernameField.classList.add("hidden");
+    }
   }
 
   msg.innerText = "";

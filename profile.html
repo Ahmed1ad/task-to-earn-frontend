@@ -401,7 +401,8 @@
         // Sidebar, user data, and dropdown are handled by main.js automatically
 
         async function initProfile() {
-            const user = await loadGlobalUserData();
+            if (!window.loadGlobalUserData) return;
+            const user = await window.loadGlobalUserData();
             if (!user) return;
 
             // Display Referral Code
@@ -424,9 +425,11 @@
 
         async function loadExtraStats() {
             try {
+                if (!window.getMyTasks || !window.API || !window.token) return;
+
                 const [tasksRes, withdrawsRes] = await Promise.all([
-                    getMyTasks(),
-                    fetch(`${API}/withdraw/my`, { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json())
+                    window.getMyTasks(),
+                    fetch(`${window.API}/withdraw/my`, { headers: { Authorization: `Bearer ${window.token}` } }).then(r => r.json())
                 ]);
 
                 if (tasksRes.status === "success") {
@@ -451,10 +454,11 @@
             }
 
             noActivity.classList.add("hidden");
+            // Show recent 5 activities
             const recent = tasks.slice(-5).reverse();
 
             container.innerHTML = recent.map(t => {
-                const date = new Date(t.completed_at).toLocaleDateString("ar-EG", { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const date = new Date(t.completed_at || t.updated_at).toLocaleDateString("ar-EG", { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                 return `
                     <div class="border border-gray-200 rounded-xl p-4 hover:shadow-md transition flex items-center justify-between animate-fade-in">
                         <div class="flex items-center gap-3">
@@ -472,13 +476,15 @@
         }
 
         window.copyReferral = () => {
-            const code = document.getElementById("referralCode").innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                alert("تم نسخ كود الإحالة بنجاح! 📋");
-            });
+            const code = document.getElementById("referralCode")?.innerText;
+            if (code) {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert("تم نسخ كود الإحالة بنجاح! 📋");
+                });
+            }
         };
 
-        if (token) initProfile();
+        if (window.token) initProfile();
     </script>
 
 </body>

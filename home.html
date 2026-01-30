@@ -123,12 +123,10 @@
           <!-- Profile Dropdown -->
           <div id="profileMenu"
             class="hidden absolute left-0 mt-2 w-40 bg-white rounded-xl shadow-lg p-2 border border-gray-100">
-            <button onclick="profile.html"
-              class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded-lg transition">
+            <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded-lg transition">
               حسابي
             </button>
-            <button onclick="withdraw.html"
-              class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded-lg transition">
+            <button class="w-full text-right px-3 py-2 hover:bg-gray-100 rounded-lg transition">
               السحب
             </button>
             <button onclick="logout()"
@@ -289,83 +287,24 @@
   <!-- ================= Script ================= -->
   <script src="main.js"></script>
   <script>
-    // Main.js handles API, token, and auth redirects automatically
+    /* ================= INITIALIZE ================= */
+    // Sidebar, user data, and dropdown are handled by main.js automatically
 
-    /* ================= SIDEBAR ================= */
-    const menuBtn = document.getElementById("menuBtn");
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-
-    menuBtn.onclick = () => {
-      sidebar.classList.remove("translate-x-full");
-      overlay.classList.remove("hidden");
-    };
-
-    function closeSidebar() {
-      sidebar.classList.add("translate-x-full");
-      overlay.classList.add("hidden");
-    }
-
-    overlay.onclick = closeSidebar;
-
-
-    // Profile dropdown
-    const profileBtn = document.getElementById("profileBtn");
-    const profileMenu = document.getElementById("profileMenu");
-
-    profileBtn.onclick = () => {
-      profileMenu.classList.toggle("hidden");
-    };
-
-    // Logout is handled by window.logout() from main.js
-
-    // Load user
-    async function loadUser() {
-      const res = await fetch(`${API}/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-
-      if (document.getElementById("username"))
-        document.getElementById("username").innerText = data.user.username;
-
-      if (document.getElementById("userPoints"))
-        document.getElementById("userPoints").innerText = data.user.points;
-
-      if (document.getElementById("walletPoints"))
-        document.getElementById("walletPoints").innerText = data.user.points;
-    }
-
-    // Load tasks (عرض فقط – بحد أقصى مهمتين)
-    async function loadTasks() {
+    // Custom logic for Home Page: Load only 2 tasks
+    async function loadHomeTasks() {
       try {
         const [adsRes, myRes] = await Promise.all([
-          fetch(`${API}/tasks/ads`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch(`${API}/tasks/my`, {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+          getAvailableTasks(),
+          getMyTasks()
         ]);
-
-        const adsData = await adsRes.json();
-        const myData = await myRes.json();
 
         const tasksContainer = document.getElementById("tasksContainer");
         const noTasks = document.getElementById("noTasks");
 
-        // IDs المهام اللي المستخدم عملها
-        const completedTaskIds = new Set(
-          myData.tasks.map(t => t.task_id)
-        );
-
-        // فلترة المهام الجديدة فقط
-        const newTasks = adsData.tasks.filter(
-          task => !completedTaskIds.has(task.id)
-        );
+        const completedTaskIds = new Set(myRes.tasks.map(t => t.task_id));
+        const newTasks = adsRes.tasks.filter(task => !completedTaskIds.has(task.id));
 
         tasksContainer.innerHTML = "";
-
         const tasksToShow = newTasks.slice(0, 2);
 
         if (!tasksToShow.length) {
@@ -381,45 +320,25 @@
           card.style.animationDelay = `${i * 100}ms`;
 
           card.innerHTML = `
-        <!-- Badge -->
-        <div class="absolute top-0 right-0 bg-emerald-100/50 text-emerald-600 px-3 py-1 rounded-bl-xl text-xs font-bold backdrop-blur-sm">
-          مهمة جديدة
-        </div>
-
-        <div class="flex items-start gap-4 mb-4">
-          <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m-9 0V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-5.25c0-.621-.504-1.125-1.125-1.125H4.125C3.504 11.625 3 12.129 3 12.75V18z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3a3 3 0 00-3 3v4.5c0 .621.504 1.125 1.125 1.125h3.75c.621 0 1.125-.504 1.125-1.125V6a3 3 0 00-3-3z" />
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1 group-hover:text-emerald-600 transition-colors">${task.title}</h3>
-            <p class="text-sm text-gray-400 line-clamp-2">${task.description}</p>
-          </div>
-        </div>
-        
-        <div class="mt-auto flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-          <div class="flex flex-col">
-            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">المكافأة</span>
-            <span class="text-emerald-600 font-black text-xl">+${task.reward_points}</span>
-          </div>
-          
-          <div class="flex flex-col items-end">
-            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">الوقت</span>
-            <span class="font-bold text-gray-700 font-mono">${task.duration_seconds}s</span>
-          </div>
-        </div>
-
-        <button onclick="location.href='tasks.html'"
-          class="mt-4 w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 hover:shadow-emerald-500/30 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-xl">
-          <span>ابدأ الآن</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:-scale-x-100 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </button>
-      `;
-
+            <div class="absolute top-0 right-0 bg-emerald-100/50 text-emerald-600 px-3 py-1 rounded-bl-xl text-xs font-bold backdrop-blur-sm">مهمة جديدة</div>
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m-9 0V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18v-5.25c0-.621-.504-1.125-1.125-1.125H4.125C3.504 11.625 3 12.129 3 12.75V18z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 3a3 3 0 00-3 3v4.5c0 .621.504 1.125 1.125 1.125h3.75c.621 0 1.125-.504 1.125-1.125V6a3 3 0 00-3-3z" /></svg>
+              </div>
+              <div>
+                <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1 group-hover:text-emerald-600 transition-colors">${task.title}</h3>
+                <p class="text-sm text-gray-400 line-clamp-2">${task.description}</p>
+              </div>
+            </div>
+            <div class="mt-auto flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <div class="flex flex-col"><span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">المكافأة</span><span class="text-emerald-600 font-black text-xl">+${task.reward_points}</span></div>
+              <div class="flex flex-col items-end"><span class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">الوقت</span><span class="font-bold text-gray-700 font-mono">${task.duration_seconds}s</span></div>
+            </div>
+            <button onclick="location.href='tasks.html'" class="mt-4 w-full py-3.5 bg-gray-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 hover:shadow-emerald-500/30 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-xl">
+              <span>ابدأ الآن</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rtl:-scale-x-100 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+            </button>
+          `;
           tasksContainer.appendChild(card);
         });
       } catch (err) {
@@ -427,10 +346,8 @@
       }
     }
 
-    // Elements checks before running
     if (token) {
-      loadUser();
-      loadTasks();
+      loadHomeTasks();
     }
   </script>
 

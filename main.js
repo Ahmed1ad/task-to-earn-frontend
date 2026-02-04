@@ -1,7 +1,14 @@
 // ================= GLOBAL CONFIG =================
-window.API = (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:")
-  ? "http://localhost:3000"
-  : "http://localhost:3000";
+const LOCAL_API = "http://localhost:3000";
+
+// لو فاتح من GitHub Pages استخدم IP الجهاز
+const REMOTE_API = "http://192.168.1.140:3000"; // ← غير الرقم ده ل IP جهازك
+
+window.API =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1"
+    ? LOCAL_API
+    : REMOTE_API;
 
 window.token = localStorage.getItem("token");
 
